@@ -36,15 +36,16 @@ textarea {
 
 .class-map {
   display: flex;
-  min-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   padding-bottom: 1rem;
 }
 
 .class-node {
   display: flex;
-  min-height: 100%;
+  min-height: 0;
   width: 100%;
   flex-direction: column;
   border-width: 1px;
@@ -238,6 +239,17 @@ textarea {
 .result-panel {
   animation: none;
   opacity: 1;
+}
+
+@media (min-width: 1024px) {
+  .diagram-panel,
+  .result-panel {
+    height: 100rem;
+    max-height: 100rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
 }
 
 .mobile-close-button {

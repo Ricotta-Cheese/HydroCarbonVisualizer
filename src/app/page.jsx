@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const reagents = ["브롬수", "과망가니즈산 칼륨", "암모니아성 질산은"];
+const desktopPanelHeight = "100rem";
 
 const hydrocarbonTypes = {
   alkane: {
@@ -255,6 +256,7 @@ function ClassNode({
   methods = [],
   active,
   onClick,
+  nodeKey,
   tone = "neutral",
   actionLabel = "Click to inspect",
 }) {
@@ -301,7 +303,11 @@ function ClassNode({
 
   if (!onClick) {
     return (
-      <div className="class-node border-slate-200 bg-white text-slate-950">
+      <div
+        className="class-node border-slate-200 bg-white text-slate-950"
+        data-class-key={nodeKey}
+        style={{ minHeight: 0 }}
+      >
         {content}
       </div>
     );
@@ -315,6 +321,8 @@ function ClassNode({
         active ? toneClasses[tone] : "border-slate-200 bg-white text-slate-950"
       }`}
       aria-pressed={active}
+      data-class-key={nodeKey}
+      style={{ minHeight: 0 }}
     >
       {content}
       <div className="uml-action">
@@ -456,13 +464,40 @@ function DescriptionPanel({ selectedDescription, onClose }) {
   );
 }
 
+function useDesktopLayout() {
+  const [isDesktopLayout, setIsDesktopLayout] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const updateDesktopLayout = () => setIsDesktopLayout(mediaQuery.matches);
+
+    updateDesktopLayout();
+    mediaQuery.addEventListener("change", updateDesktopLayout);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateDesktopLayout);
+    };
+  }, []);
+
+  return isDesktopLayout;
+}
+
 export default function Home() {
   const [selectedKey, setSelectedKey] = useState("alkane");
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const isDesktopLayout = useDesktopLayout();
   const selectedDescription = useMemo(
     () => getDescriptionData(selectedKey),
     [selectedKey]
   );
+  const lockedPanelStyle = isDesktopLayout
+    ? {
+        height: desktopPanelHeight,
+        maxHeight: desktopPanelHeight,
+        overflowX: "hidden",
+        overflowY: "auto",
+      }
+    : undefined;
 
   function handleClassSelect(key) {
     setSelectedKey(key);
@@ -487,8 +522,15 @@ export default function Home() {
           </p>
         </header>
 
-        <div className="grid flex-1 gap-6 py-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(400px,0.92fr)] lg:items-stretch">
-          <section className="rounded-[2rem] border border-slate-200 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-7">
+        <div
+          className="grid flex-1 gap-6 py-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(400px,0.92fr)] lg:items-start"
+          data-layout-grid
+        >
+          <section
+            className="diagram-panel flex flex-col rounded-[2rem] border border-slate-200 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-7 lg:h-[100rem] lg:max-h-[100rem] lg:overflow-x-hidden lg:overflow-y-auto"
+            data-diagram-panel
+            style={lockedPanelStyle}
+          >
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -503,7 +545,7 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="class-map">
+            <div className="class-map" style={{ justifyContent: "flex-start" }}>
               <ClassNode
                 description="«abstract» interface"
                 fields={["- fields: none"]}
@@ -517,6 +559,7 @@ export default function Home() {
                 tone="slate"
                 active={selectedKey === "adt"}
                 onClick={() => handleClassSelect("adt")}
+                nodeKey="adt"
               >
                 HydrocarbonADT
               </ClassNode>
@@ -534,6 +577,7 @@ export default function Home() {
                 tone="slate"
                 active={selectedKey === "base"}
                 onClick={() => handleClassSelect("base")}
+                nodeKey="base"
               >
                 Hydrocarbon
               </ClassNode>
@@ -563,6 +607,7 @@ export default function Home() {
                       tone={type.accent}
                       active={selectedKey === key}
                       onClick={() => handleClassSelect(key)}
+                      nodeKey={key}
                     >
                       {type.className}
                     </ClassNode>
@@ -572,7 +617,11 @@ export default function Home() {
             </div>
           </section>
 
-          <aside className="result-panel hidden rounded-[2rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:p-7 lg:block">
+          <aside
+            className="result-panel hidden rounded-[2rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:p-7 lg:block lg:h-[100rem] lg:max-h-[100rem] lg:overflow-x-hidden lg:overflow-y-auto"
+            data-description-panel
+            style={lockedPanelStyle}
+          >
             <DescriptionPanel
               selectedDescription={selectedDescription}
             />
