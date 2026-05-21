@@ -137,13 +137,118 @@ function ClassNode({ children, description, active, onClick, tone = "neutral" })
   );
 }
 
+function DescriptionPanel({ selectedType, selectedDetails, onClose }) {
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex items-start justify-between gap-5">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300">
+            Class Description
+          </p>
+          <h2 className="mt-3 text-4xl font-semibold tracking-normal">
+            {selectedType.className}
+          </h2>
+          <p className="korean-keep mt-3 text-base leading-7 text-slate-300">
+            {selectedType.koreanName}은 {selectedType.role}입니다.
+          </p>
+        </div>
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="mobile-close-button"
+            aria-label="Close class description"
+          >
+            X
+          </button>
+        ) : null}
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="metric-card">
+          <span>sample</span>
+          <strong>{selectedType.sampleName}</strong>
+        </div>
+        <div className="metric-card">
+          <span>formula</span>
+          <strong>{selectedDetails.formula}</strong>
+        </div>
+        <div className="metric-card">
+          <span>mass</span>
+          <strong>{selectedDetails.molarMass}g/mol</strong>
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+          fields
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {["__name", "__c_count", "__h_count"].map((field) => (
+            <code
+              key={field}
+              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-semibold text-slate-100"
+            >
+              {field}
+            </code>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+            method call
+          </p>
+          <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
+            get_combustion_reaction()
+          </code>
+        </div>
+        <p className="mt-5 rounded-2xl bg-black/25 p-4 font-mono text-sm leading-7 text-teal-100 lg:text-base">
+          {selectedDetails.combustionReaction}
+        </p>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+            overridden behavior
+          </p>
+          <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
+            perform_test(reagent)
+          </code>
+        </div>
+        <div className="mt-5 space-y-3">
+          {selectedDetails.reagentResults.map(({ reagent, result }) => (
+            <div
+              key={reagent}
+              className="rounded-2xl border border-white/10 bg-black/20 p-4"
+            >
+              <p className="text-sm font-semibold text-slate-400">
+                {selectedType.sampleName} + {reagent}
+              </p>
+              <p className="mt-2 text-lg font-semibold text-white">{result}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [selectedKey, setSelectedKey] = useState("alkane");
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const selectedType = hydrocarbonTypes[selectedKey];
   const selectedDetails = useMemo(
     () => getHydrocarbonDetails(selectedType),
     [selectedType]
   );
+
+  function handleClassSelect(key) {
+    setSelectedKey(key);
+    setIsDescriptionOpen(true);
+  }
 
   return (
     <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,#eefcf9,transparent_34%),linear-gradient(180deg,#ffffff_0%,#f7f8fb_100%)] text-slate-950">
@@ -163,12 +268,12 @@ export default function Home() {
           </p>
         </header>
 
-        <div className="grid flex-1 gap-6 py-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
+        <div className="grid flex-1 gap-6 py-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(400px,0.92fr)] lg:items-stretch">
           <section className="rounded-[2rem] border border-slate-200 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-7">
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
-                  Inheritance Structure
+                  OOP Design
                 </p>
                 <h2 className="korean-keep mt-2 text-2xl font-semibold text-slate-950">
                   ADT에서 Concrete Class까지
@@ -195,7 +300,7 @@ export default function Home() {
                       description={type.formulaRule}
                       tone={type.accent}
                       active={selectedKey === key}
-                      onClick={() => setSelectedKey(key)}
+                      onClick={() => handleClassSelect(key)}
                     >
                       {type.className}
                     </ClassNode>
@@ -205,78 +310,36 @@ export default function Home() {
             </div>
           </section>
 
-          <aside className="result-panel rounded-[2rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:p-7">
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300">
-                  Selected Class
-                </p>
-                <h2 className="mt-3 text-4xl font-semibold tracking-normal">
-                  {selectedType.className}
-                </h2>
-                <p className="korean-keep mt-3 text-base leading-7 text-slate-300">
-                  {selectedType.koreanName}은 {selectedType.role}입니다.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="metric-card">
-                  <span>sample</span>
-                  <strong>{selectedType.sampleName}</strong>
-                </div>
-                <div className="metric-card">
-                  <span>formula</span>
-                  <strong>{selectedDetails.formula}</strong>
-                </div>
-                <div className="metric-card">
-                  <span>mass</span>
-                  <strong>{selectedDetails.molarMass}g/mol</strong>
-                </div>
-              </div>
-
-              <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-                    method call
-                  </p>
-                  <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
-                    get_combustion_reaction()
-                  </code>
-                </div>
-                <p className="mt-5 rounded-2xl bg-black/25 p-4 font-mono text-sm leading-7 text-teal-100 lg:text-base">
-                  {selectedDetails.combustionReaction}
-                </p>
-              </div>
-
-              <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-                    overridden behavior
-                  </p>
-                  <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
-                    perform_test(reagent)
-                  </code>
-                </div>
-                <div className="mt-5 space-y-3">
-                  {selectedDetails.reagentResults.map(({ reagent, result }) => (
-                    <div
-                      key={reagent}
-                      className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                    >
-                      <p className="text-sm font-semibold text-slate-400">
-                        {selectedType.sampleName} + {reagent}
-                      </p>
-                      <p className="mt-2 text-lg font-semibold text-white">
-                        {result}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <aside className="result-panel hidden rounded-[2rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:p-7 lg:block">
+            <DescriptionPanel
+              selectedType={selectedType}
+              selectedDetails={selectedDetails}
+            />
           </aside>
         </div>
       </section>
+
+      {isDescriptionOpen ? (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-950 text-white lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-class-description-title"
+        >
+          <div className="min-h-screen p-5">
+            <section
+              id="mobile-class-description-title"
+              className="mx-auto max-w-xl"
+            >
+              <DescriptionPanel
+                selectedType={selectedType}
+                selectedDetails={selectedDetails}
+                onClose={() => setIsDescriptionOpen(false)}
+              />
+            </section>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

@@ -62,7 +62,33 @@ textarea {
 }
 
 .result-panel {
-  animation: panel-rise 520ms ease both;
+  animation: none;
+  opacity: 1;
+}
+
+.mobile-close-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.mobile-close-button:hover,
+.mobile-close-button:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  transform: scale(1.04);
+  outline: none;
 }
 
 .metric-card {
@@ -93,12 +119,10 @@ textarea {
 
 @keyframes panel-rise {
   from {
-    opacity: 0;
     transform: translateY(14px);
   }
 
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
