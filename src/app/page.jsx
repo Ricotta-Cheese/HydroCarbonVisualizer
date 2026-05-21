@@ -517,8 +517,9 @@ export default function Home() {
             </h1>
           </div>
           <p className="korean-keep max-w-md text-base leading-7 text-slate-600">
-            Python OOP 구조를 웹에서 클릭 가능한 상속 지도로 옮기고,
-            동일한 메서드 호출이 클래스마다 다르게 동작하는 모습을 보여줍니다.
+            탄화수소는 탄소와 수소만으로 이루어진 유기 화합물입니다.
+            결합 종류에 따라 알케인, 알켄, 알카인으로 나뉘며 연소와 시약
+            반응도 달라집니다.
           </p>
         </header>
 
