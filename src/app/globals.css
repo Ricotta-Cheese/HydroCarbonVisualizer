@@ -19,6 +19,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 button,
@@ -26,4 +27,78 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+.korean-keep {
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+.class-map {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.class-node {
+  width: 100%;
+  border-width: 1px;
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  text-align: left;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+}
+
+.map-line {
+  margin: 0 auto;
+  height: 3.25rem;
+  width: 1px;
+  background: linear-gradient(180deg, #cbd5e1 0%, #0f172a 100%);
+}
+
+.map-line-short {
+  height: 2rem;
+}
+
+.result-panel {
+  animation: panel-rise 520ms ease both;
+}
+
+.metric-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1rem;
+}
+
+.metric-card span {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 0.5rem;
+  color: #ffffff;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+@keyframes panel-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
