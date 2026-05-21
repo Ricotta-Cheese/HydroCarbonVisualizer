@@ -67,6 +67,70 @@ const hydrocarbonTypes = {
   },
 };
 
+const structuralClasses = {
+  adt: {
+    className: "HydrocarbonADT",
+    role: "탄화수소 객체가 반드시 가져야 할 공통 규격을 정의하는 추상 클래스",
+    accent: "slate",
+    metrics: [
+      { label: "type", value: "ABC" },
+      { label: "fields", value: "없음" },
+      { label: "contract", value: "5 rules" },
+    ],
+    fields: [
+      {
+        name: "없음",
+        description: "저장 데이터 없이 하위 클래스가 지켜야 할 인터페이스만 선언합니다.",
+      },
+    ],
+    methods: [
+      { name: "formula", description: "분자식을 반환해야 하는 추상 프로퍼티" },
+      { name: "molar_mass", description: "분자량을 반환해야 하는 추상 프로퍼티" },
+      { name: "display_info()", description: "분자 정보를 출력하는 추상 메서드" },
+      {
+        name: "get_combustion_reaction()",
+        description: "연소 반응식을 반환하는 추상 메서드",
+      },
+      {
+        name: "perform_test(reagent)",
+        description: "시약 반응 결과를 처리하는 추상 메서드",
+      },
+    ],
+    designNote:
+      "ADT는 직접 실행되는 클래스가 아니라, Base Class와 하위 클래스가 반드시 구현해야 하는 약속을 만드는 설계 계층입니다.",
+  },
+  base: {
+    className: "Hydrocarbon",
+    role: "추상 규격을 실제 계산 로직과 private field로 구현하는 Base Class",
+    accent: "slate",
+    metrics: [
+      { label: "extends", value: "ADT" },
+      { label: "fields", value: "3" },
+      { label: "logic", value: "shared" },
+    ],
+    fields: [
+      { name: "__name", description: "탄화수소 이름을 보호하는 private field" },
+      { name: "__c_count", description: "탄소 수를 보호하는 private field" },
+      { name: "__h_count", description: "수소 수를 보호하는 private field" },
+    ],
+    methods: [
+      { name: "formula", description: "C/H 원자 수를 이용해 분자식을 계산" },
+      { name: "molar_mass", description: "탄소 12, 수소 1 기준으로 분자량 계산" },
+      { name: "display_info()", description: "이름, 화학식, 분자량 출력" },
+      {
+        name: "get_combustion_reaction()",
+        description: "공통 연소 반응식 계산",
+      },
+      {
+        name: "perform_test(reagent)",
+        description: "기본값으로 반응 없음 출력",
+      },
+    ],
+    designNote:
+      "Base Class는 공통 데이터와 계산을 한곳에 모으고, Alkane/Alkene/Alkyne이 필요한 부분만 재정의하도록 받쳐줍니다.",
+  },
+};
+
 const typeKeys = Object.keys(hydrocarbonTypes);
 
 function formatNumber(value) {
@@ -93,9 +157,67 @@ function getHydrocarbonDetails(type) {
   };
 }
 
-function ClassNode({ children, description, active, onClick, tone = "neutral" }) {
+function getConcreteDescription(type) {
+  const details = getHydrocarbonDetails(type);
+
+  return {
+    className: type.className,
+    role: `${type.koreanName}은 ${type.role}입니다.`,
+    accent: type.accent,
+    metrics: [
+      { label: "sample", value: type.sampleName },
+      { label: "formula", value: details.formula },
+      { label: "mass", value: `${details.molarMass}g/mol` },
+    ],
+    fields: [
+      { name: "__name", description: "Hydrocarbon에서 상속받은 이름 field" },
+      { name: "__c_count", description: "Hydrocarbon에서 상속받은 탄소 수 field" },
+      { name: "__h_count", description: "Hydrocarbon에서 상속받은 수소 수 field" },
+    ],
+    methods: [
+      { name: "__init__()", description: `${type.formulaRule} 규칙에 맞춰 수소 수 설정` },
+      {
+        name: "get_combustion_reaction()",
+        description: "부모의 공통 연소식을 재사용한 뒤 클래스 이름을 붙여 오버라이드",
+      },
+      {
+        name: "perform_test(reagent)",
+        description: "시약별 반응 결과를 클래스 특성에 맞게 오버라이드",
+      },
+    ],
+    designNote:
+      "같은 메서드를 호출해도 선택된 concrete class에 따라 서로 다른 출력이 만들어지는 지점입니다.",
+    methodCall: {
+      name: "get_combustion_reaction()",
+      result: details.combustionReaction,
+    },
+    reagentResults: details.reagentResults.map(({ reagent, result }) => ({
+      reagent,
+      result,
+      sampleName: type.sampleName,
+    })),
+  };
+}
+
+function getDescriptionData(selectedKey) {
+  if (structuralClasses[selectedKey]) {
+    return structuralClasses[selectedKey];
+  }
+
+  return getConcreteDescription(hydrocarbonTypes[selectedKey]);
+}
+
+function ClassNode({
+  children,
+  description,
+  active,
+  onClick,
+  tone = "neutral",
+  actionLabel = "Click to inspect",
+}) {
   const toneClasses = {
     neutral: "border-slate-200 bg-white text-slate-950",
+    slate: "border-slate-400 bg-slate-100 text-slate-950 shadow-slate-100",
     teal: "border-teal-300 bg-teal-50 text-teal-950 shadow-teal-100",
     amber: "border-amber-300 bg-amber-50 text-amber-950 shadow-amber-100",
     violet: "border-violet-300 bg-violet-50 text-violet-950 shadow-violet-100",
@@ -131,13 +253,13 @@ function ClassNode({ children, description, active, onClick, tone = "neutral" })
     >
       {content}
       <span className="mt-5 inline-flex rounded-full border border-current px-3 py-1 text-xs font-semibold">
-        Click to override
+        {actionLabel}
       </span>
     </button>
   );
 }
 
-function DescriptionPanel({ selectedType, selectedDetails, onClose }) {
+function DescriptionPanel({ selectedDescription, onClose }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between gap-5">
@@ -146,10 +268,10 @@ function DescriptionPanel({ selectedType, selectedDetails, onClose }) {
             Class Description
           </p>
           <h2 className="mt-3 text-4xl font-semibold tracking-normal">
-            {selectedType.className}
+            {selectedDescription.className}
           </h2>
           <p className="korean-keep mt-3 text-base leading-7 text-slate-300">
-            {selectedType.koreanName}은 {selectedType.role}입니다.
+            {selectedDescription.role}
           </p>
         </div>
         {onClose ? (
@@ -165,18 +287,12 @@ function DescriptionPanel({ selectedType, selectedDetails, onClose }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <div className="metric-card">
-          <span>sample</span>
-          <strong>{selectedType.sampleName}</strong>
-        </div>
-        <div className="metric-card">
-          <span>formula</span>
-          <strong>{selectedDetails.formula}</strong>
-        </div>
-        <div className="metric-card">
-          <span>mass</span>
-          <strong>{selectedDetails.molarMass}g/mol</strong>
-        </div>
+        {selectedDescription.metrics.map(({ label, value }) => (
+          <div className="metric-card" key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
+          </div>
+        ))}
       </div>
 
       <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
@@ -184,54 +300,91 @@ function DescriptionPanel({ selectedType, selectedDetails, onClose }) {
           fields
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {["__name", "__c_count", "__h_count"].map((field) => (
-            <code
-              key={field}
-              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-semibold text-slate-100"
-            >
-              {field}
-            </code>
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-            method call
-          </p>
-          <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
-            get_combustion_reaction()
-          </code>
-        </div>
-        <p className="mt-5 rounded-2xl bg-black/25 p-4 font-mono text-sm leading-7 text-teal-100 lg:text-base">
-          {selectedDetails.combustionReaction}
-        </p>
-      </div>
-
-      <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
-            overridden behavior
-          </p>
-          <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
-            perform_test(reagent)
-          </code>
-        </div>
-        <div className="mt-5 space-y-3">
-          {selectedDetails.reagentResults.map(({ reagent, result }) => (
+          {selectedDescription.fields.map((field) => (
             <div
-              key={reagent}
-              className="rounded-2xl border border-white/10 bg-black/20 p-4"
+              key={field.name}
+              className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3"
             >
-              <p className="text-sm font-semibold text-slate-400">
-                {selectedType.sampleName} + {reagent}
+              <code className="text-sm font-semibold text-slate-100">
+                {field.name}
+              </code>
+              <p className="korean-keep mt-2 text-sm leading-6 text-slate-400">
+                {field.description}
               </p>
-              <p className="mt-2 text-lg font-semibold text-white">{result}</p>
             </div>
           ))}
         </div>
       </div>
+
+      <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+          methods & properties
+        </p>
+        <div className="mt-4 space-y-3">
+          {selectedDescription.methods.map((method) => (
+            <div
+              key={method.name}
+              className="rounded-2xl border border-white/10 bg-black/20 p-4"
+            >
+              <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
+                {method.name}
+              </code>
+              <p className="korean-keep mt-3 text-sm leading-6 text-slate-300">
+                {method.description}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="korean-keep mt-4 rounded-2xl bg-black/25 p-4 text-sm leading-7 text-teal-100">
+          {selectedDescription.designNote}
+        </p>
+      </div>
+
+      {selectedDescription.methodCall ? (
+        <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+              method call
+            </p>
+            <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
+              {selectedDescription.methodCall.name}
+            </code>
+          </div>
+          <p className="mt-5 rounded-2xl bg-black/25 p-4 font-mono text-sm leading-7 text-teal-100 lg:text-base">
+            {selectedDescription.methodCall.result}
+          </p>
+        </div>
+      ) : null}
+
+      {selectedDescription.reagentResults ? (
+        <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+              overridden behavior
+            </p>
+            <code className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-950">
+              perform_test(reagent)
+            </code>
+          </div>
+          <div className="mt-5 space-y-3">
+            {selectedDescription.reagentResults.map(
+              ({ reagent, result, sampleName }) => (
+                <div
+                  key={reagent}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                >
+                  <p className="text-sm font-semibold text-slate-400">
+                    {sampleName} + {reagent}
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-white">
+                    {result}
+                  </p>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -239,10 +392,9 @@ function DescriptionPanel({ selectedType, selectedDetails, onClose }) {
 export default function Home() {
   const [selectedKey, setSelectedKey] = useState("alkane");
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
-  const selectedType = hydrocarbonTypes[selectedKey];
-  const selectedDetails = useMemo(
-    () => getHydrocarbonDetails(selectedType),
-    [selectedType]
+  const selectedDescription = useMemo(
+    () => getDescriptionData(selectedKey),
+    [selectedKey]
   );
 
   function handleClassSelect(key) {
@@ -285,11 +437,23 @@ export default function Home() {
             </div>
 
             <div className="class-map">
-              <ClassNode description="abstract data type">
+              <ClassNode
+                description="abstract data type"
+                tone="slate"
+                active={selectedKey === "adt"}
+                onClick={() => handleClassSelect("adt")}
+              >
                 HydrocarbonADT
               </ClassNode>
               <div className="map-line" aria-hidden="true" />
-              <ClassNode description="base class">Hydrocarbon</ClassNode>
+              <ClassNode
+                description="base class"
+                tone="slate"
+                active={selectedKey === "base"}
+                onClick={() => handleClassSelect("base")}
+              >
+                Hydrocarbon
+              </ClassNode>
               <div className="map-line map-line-short" aria-hidden="true" />
               <div className="grid gap-4 md:grid-cols-3">
                 {typeKeys.map((key) => {
@@ -301,6 +465,7 @@ export default function Home() {
                       tone={type.accent}
                       active={selectedKey === key}
                       onClick={() => handleClassSelect(key)}
+                      actionLabel="Click to override"
                     >
                       {type.className}
                     </ClassNode>
@@ -312,8 +477,7 @@ export default function Home() {
 
           <aside className="result-panel hidden rounded-[2rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_24px_80px_rgba(15,23,42,0.18)] sm:p-7 lg:block">
             <DescriptionPanel
-              selectedType={selectedType}
-              selectedDetails={selectedDetails}
+              selectedDescription={selectedDescription}
             />
           </aside>
         </div>
@@ -332,8 +496,7 @@ export default function Home() {
               className="mx-auto max-w-xl"
             >
               <DescriptionPanel
-                selectedType={selectedType}
-                selectedDetails={selectedDetails}
+                selectedDescription={selectedDescription}
                 onClose={() => setIsDescriptionOpen(false)}
               />
             </section>
