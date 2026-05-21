@@ -137,19 +137,50 @@ function formatNumber(value) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
+function FormulaRule({ rule }) {
+  const hydrogenRule = {
+    "CnH2n+2": "2n+2",
+    CnH2n: "2n",
+    "CnH2n-2": "2n-2",
+  }[rule];
+
+  return (
+    <span className="formula">
+      C<sub>n</sub>H<sub>{hydrogenRule}</sub>
+    </span>
+  );
+}
+
+function ChemicalFormula({ carbon, hydrogen }) {
+  return (
+    <span className="formula">
+      C<sub>{carbon}</sub>H<sub>{hydrogen}</sub>
+    </span>
+  );
+}
+
+function CombustionEquation({ type, details }) {
+  return (
+    <span className="equation">
+      {type.reactionPrefix}{" "}
+      <ChemicalFormula carbon={type.cCount} hydrogen={details.hCount} /> +{" "}
+      {formatNumber(details.oxygen)} O<sub>2</sub> → {type.cCount} CO
+      <sub>2</sub> + {formatNumber(details.water)} H<sub>2</sub>O
+    </span>
+  );
+}
+
 function getHydrocarbonDetails(type) {
   const hCount = type.hydrogenCount(type.cCount);
-  const formula = `C${type.cCount}H${hCount}`;
   const molarMass = type.cCount * 12 + hCount;
   const oxygen = type.cCount + hCount / 4;
   const water = hCount / 2;
 
   return {
-    formula,
+    hCount,
+    oxygen,
+    water,
     molarMass,
-    combustionReaction: `${type.reactionPrefix} ${formula} + ${formatNumber(
-      oxygen
-    )} O₂ → ${type.cCount} CO₂ + ${formatNumber(water)} H₂O`,
     reagentResults: reagents.map((reagent) => ({
       reagent,
       result: type.reagentResult(reagent),
@@ -166,7 +197,10 @@ function getConcreteDescription(type) {
     accent: type.accent,
     metrics: [
       { label: "sample", value: type.sampleName },
-      { label: "formula", value: details.formula },
+      {
+        label: "formula",
+        value: <ChemicalFormula carbon={type.cCount} hydrogen={details.hCount} />,
+      },
       { label: "mass", value: `${details.molarMass}g/mol` },
     ],
     fields: [
@@ -175,7 +209,14 @@ function getConcreteDescription(type) {
       { name: "__h_count", description: "Hydrocarbon에서 상속받은 수소 수 field" },
     ],
     methods: [
-      { name: "__init__()", description: `${type.formulaRule} 규칙에 맞춰 수소 수 설정` },
+      {
+        name: "__init__()",
+        description: (
+          <>
+            <FormulaRule rule={type.formulaRule} /> 규칙에 맞춰 수소 수 설정
+          </>
+        ),
+      },
       {
         name: "get_combustion_reaction()",
         description: "부모의 공통 연소식을 재사용한 뒤 클래스 이름을 붙여 오버라이드",
@@ -189,7 +230,7 @@ function getConcreteDescription(type) {
       "같은 메서드를 호출해도 선택된 concrete class에 따라 서로 다른 출력이 만들어지는 지점입니다.",
     methodCall: {
       name: "get_combustion_reaction()",
-      result: details.combustionReaction,
+      result: <CombustionEquation type={type} details={details} />,
     },
     reagentResults: details.reagentResults.map(({ reagent, result }) => ({
       reagent,
@@ -276,9 +317,11 @@ function ClassNode({
       aria-pressed={active}
     >
       {content}
-      <span className="mt-4 inline-flex rounded-full border border-current px-3 py-1 text-xs font-semibold">
-        {actionLabel}
-      </span>
+      <div className="uml-action">
+        <span className="inline-flex rounded-full border border-current px-3 py-1 text-xs font-semibold">
+          {actionLabel}
+        </span>
+      </div>
     </button>
   );
 }
@@ -506,7 +549,11 @@ export default function Home() {
                   return (
                     <ClassNode
                       key={key}
-                      description={`concrete class · ${type.formulaRule}`}
+                      description={
+                        <>
+                          concrete class · <FormulaRule rule={type.formulaRule} />
+                        </>
+                      }
                       fields={["inherited fields"]}
                       methods={[
                         "+ __init__()",
