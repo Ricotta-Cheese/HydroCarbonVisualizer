@@ -210,6 +210,8 @@ function getDescriptionData(selectedKey) {
 function ClassNode({
   children,
   description,
+  fields = [],
+  methods = [],
   active,
   onClick,
   tone = "neutral",
@@ -225,12 +227,34 @@ function ClassNode({
 
   const content = (
     <>
-      <span className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-        {description}
-      </span>
-      <strong className="mt-2 block text-2xl font-semibold tracking-normal">
-        {children}
-      </strong>
+      <div className="uml-section uml-heading">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          {description}
+        </span>
+        <strong className="mt-2 block text-2xl font-semibold tracking-normal">
+          {children}
+        </strong>
+      </div>
+      <div className="uml-section">
+        <span className="uml-label">Fields</span>
+        <div className="mt-2 space-y-1.5">
+          {fields.map((field) => (
+            <div className="uml-line" key={field}>
+              <code>{field}</code>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="uml-section">
+        <span className="uml-label">Methods</span>
+        <div className="mt-2 space-y-1.5">
+          {methods.map((method) => (
+            <div className="uml-line" key={method}>
+              <code>{method}</code>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 
@@ -252,7 +276,7 @@ function ClassNode({
       aria-pressed={active}
     >
       {content}
-      <span className="mt-5 inline-flex rounded-full border border-current px-3 py-1 text-xs font-semibold">
+      <span className="mt-4 inline-flex rounded-full border border-current px-3 py-1 text-xs font-semibold">
         {actionLabel}
       </span>
     </button>
@@ -425,10 +449,10 @@ export default function Home() {
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
-                  OOP Design
+                  UML Diagram
                 </p>
                 <h2 className="korean-keep mt-2 text-2xl font-semibold text-slate-950">
-                  ADT에서 Concrete Class까지
+                  OOP Class Diagram
                 </h2>
               </div>
               <span className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
@@ -438,7 +462,15 @@ export default function Home() {
 
             <div className="class-map">
               <ClassNode
-                description="abstract data type"
+                description="«abstract» interface"
+                fields={["- fields: none"]}
+                methods={[
+                  "+ formula: property",
+                  "+ molar_mass: property",
+                  "+ display_info()",
+                  "+ combustion_reaction()",
+                  "+ perform_test()",
+                ]}
                 tone="slate"
                 active={selectedKey === "adt"}
                 onClick={() => handleClassSelect("adt")}
@@ -448,20 +480,39 @@ export default function Home() {
               <div className="map-line" aria-hidden="true" />
               <ClassNode
                 description="base class"
+                fields={["- __name: str", "- __c_count: int", "- __h_count: int"]}
+                methods={[
+                  "+ formula: property",
+                  "+ molar_mass: property",
+                  "+ display_info()",
+                  "+ combustion_reaction()",
+                  "+ perform_test()",
+                ]}
                 tone="slate"
                 active={selectedKey === "base"}
                 onClick={() => handleClassSelect("base")}
               >
                 Hydrocarbon
               </ClassNode>
-              <div className="map-line map-line-short" aria-hidden="true" />
+              <div className="uml-branch" aria-hidden="true">
+                <span className="uml-branch-arrow" />
+                <span className="uml-branch-drop uml-branch-drop-left" />
+                <span className="uml-branch-drop uml-branch-drop-center" />
+                <span className="uml-branch-drop uml-branch-drop-right" />
+              </div>
               <div className="grid gap-4 md:grid-cols-3">
                 {typeKeys.map((key) => {
                   const type = hydrocarbonTypes[key];
                   return (
                     <ClassNode
                       key={key}
-                      description={type.formulaRule}
+                      description={`concrete class · ${type.formulaRule}`}
+                      fields={["inherited fields"]}
+                      methods={[
+                        "+ __init__()",
+                        "+ combustion_reaction()",
+                        "+ perform_test()",
+                      ]}
                       tone={type.accent}
                       active={selectedKey === key}
                       onClick={() => handleClassSelect(key)}
