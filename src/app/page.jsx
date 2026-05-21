@@ -1,73 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import AppNavigation from "@/components/AppNavigation";
+import {
+  formatNumber,
+  getHydrocarbonDetails,
+  hydrocarbonTypes,
+  typeKeys,
+} from "@/lib/hydrocarbons";
 
-const reagents = ["브롬수", "과망가니즈산 칼륨", "암모니아성 질산은"];
 const desktopPanelHeight = "100rem";
-
-const hydrocarbonTypes = {
-  alkane: {
-    className: "Alkane",
-    koreanName: "알케인",
-    sampleName: "뷰테인",
-    cCount: 4,
-    formulaRule: "CnH2n+2",
-    accent: "teal",
-    role: "단일 결합으로 이루어진 포화 탄화수소",
-    reactionPrefix: "[알케인 연소]",
-    hydrogenCount: (carbon) => 2 * carbon + 2,
-    reagentResult: (reagent) => {
-      if (reagent === "브롬수" || reagent === "과망가니즈산 칼륨") {
-        return "반응하지 않음";
-      }
-      if (reagent === "암모니아성 질산은") {
-        return "아무런 변화가 없음";
-      }
-      return "반응 데이터 없음";
-    },
-  },
-  alkene: {
-    className: "Alkene",
-    koreanName: "알켄",
-    sampleName: "뷰텐",
-    cCount: 4,
-    formulaRule: "CnH2n",
-    accent: "amber",
-    role: "이중 결합을 가진 불포화 탄화수소",
-    reactionPrefix: "[알켄 연소]",
-    hydrogenCount: (carbon) => 2 * carbon,
-    reagentResult: (reagent) => {
-      if (reagent === "브롬수") {
-        return "적갈색 브롬수가 무색으로 탈색됨";
-      }
-      if (reagent === "과망가니즈산 칼륨") {
-        return "보라색 용액이 사라지고 갈색 침전이 생김";
-      }
-      return "반응하지 않음";
-    },
-  },
-  alkyne: {
-    className: "Alkyne",
-    koreanName: "알카인",
-    sampleName: "뷰타인",
-    cCount: 4,
-    formulaRule: "CnH2n-2",
-    accent: "violet",
-    role: "삼중 결합을 가진 불포화 탄화수소",
-    reactionPrefix: "[알카인 연소]",
-    hydrogenCount: (carbon) => 2 * carbon - 2,
-    reagentResult: (reagent) => {
-      if (reagent === "암모니아성 질산은") {
-        return "흰색 침전물 생성됨";
-      }
-      if (reagent === "브롬수" || reagent === "과망가니즈산 칼륨") {
-        return "빠르게 반응하여 색이 변화함";
-      }
-      return "반응함";
-    },
-  },
-};
-
 const structuralClasses = {
   adt: {
     className: "HydrocarbonADT",
@@ -132,12 +74,6 @@ const structuralClasses = {
   },
 };
 
-const typeKeys = Object.keys(hydrocarbonTypes);
-
-function formatNumber(value) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(1);
-}
-
 function FormulaRule({ rule }) {
   const hydrogenRule = {
     "CnH2n+2": "2n+2",
@@ -164,29 +100,11 @@ function CombustionEquation({ type, details }) {
   return (
     <span className="equation">
       {type.reactionPrefix}{" "}
-      <ChemicalFormula carbon={type.cCount} hydrogen={details.hCount} /> +{" "}
-      {formatNumber(details.oxygen)} O<sub>2</sub> → {type.cCount} CO
+      <ChemicalFormula carbon={details.carbon} hydrogen={details.hCount} /> +{" "}
+      {formatNumber(details.oxygen)} O<sub>2</sub> → {details.carbon} CO
       <sub>2</sub> + {formatNumber(details.water)} H<sub>2</sub>O
     </span>
   );
-}
-
-function getHydrocarbonDetails(type) {
-  const hCount = type.hydrogenCount(type.cCount);
-  const molarMass = type.cCount * 12 + hCount;
-  const oxygen = type.cCount + hCount / 4;
-  const water = hCount / 2;
-
-  return {
-    hCount,
-    oxygen,
-    water,
-    molarMass,
-    reagentResults: reagents.map((reagent) => ({
-      reagent,
-      result: type.reagentResult(reagent),
-    })),
-  };
 }
 
 function getConcreteDescription(type) {
@@ -200,7 +118,7 @@ function getConcreteDescription(type) {
       { label: "sample", value: type.sampleName },
       {
         label: "formula",
-        value: <ChemicalFormula carbon={type.cCount} hydrogen={details.hCount} />,
+        value: <ChemicalFormula carbon={details.carbon} hydrogen={details.hCount} />,
       },
       { label: "mass", value: `${details.molarMass}g/mol` },
     ],
@@ -507,16 +425,18 @@ export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,#eefcf9,transparent_34%),linear-gradient(180deg,#ffffff_0%,#f7f8fb_100%)] text-slate-950">
       <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-8 sm:px-8 lg:px-10">
-        <header className="flex flex-col gap-4 border-b border-slate-200/80 pb-7 sm:flex-row sm:items-end sm:justify-between">
+        <AppNavigation active="class-map" />
+
+        <header className="border-b border-slate-200/80 pb-7 text-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-teal-700">
               OOP Assignment 2
             </p>
-            <h1 className="mt-4 max-w-4xl text-5xl font-semibold leading-[1.02] tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
+            <h1 className="mx-auto mt-4 max-w-4xl text-5xl font-semibold leading-[1.02] tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
               Hydrocarbon Class Map
             </h1>
           </div>
-          <p className="korean-keep max-w-md text-base leading-7 text-slate-600">
+          <p className="korean-keep mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">
             탄화수소는 탄소와 수소만으로 이루어진 유기 화합물입니다.
             결합 종류에 따라 알케인, 알켄, 알카인으로 나뉘며 연소와 시약
             반응도 달라집니다.
