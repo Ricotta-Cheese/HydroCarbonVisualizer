@@ -456,7 +456,7 @@ export default function Home() {
                 </h2>
               </div>
               <span className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
-                Polymorphism Ready
+                Interactive OOP Map
               </span>
             </div>
 
@@ -516,7 +516,6 @@ export default function Home() {
                       tone={type.accent}
                       active={selectedKey === key}
                       onClick={() => handleClassSelect(key)}
-                      actionLabel="Click to override"
                     >
                       {type.className}
                     </ClassNode>
