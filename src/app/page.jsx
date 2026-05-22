@@ -474,7 +474,7 @@ export default function Home() {
                   "+ formula: property",
                   "+ molar_mass: property",
                   "+ display_info()",
-                  "+ combustion_reaction()",
+                  "+ get_combustion_reaction()",
                   "+ perform_test()",
                 ]}
                 tone="slate"
@@ -492,7 +492,7 @@ export default function Home() {
                   "+ formula: property",
                   "+ molar_mass: property",
                   "+ display_info()",
-                  "+ combustion_reaction()",
+                  "+ get_combustion_reaction()",
                   "+ perform_test()",
                 ]}
                 tone="slate"
@@ -522,7 +522,7 @@ export default function Home() {
                       fields={["inherited fields"]}
                       methods={[
                         "+ __init__()",
-                        "+ combustion_reaction()",
+                        "+ get_combustion_reaction()",
                         "+ perform_test()",
                       ]}
                       tone={type.accent}

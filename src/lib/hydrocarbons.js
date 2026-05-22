@@ -1,5 +1,35 @@
 export const reagents = ["브롬수", "과망가니즈산 칼륨", "암모니아성 질산은"];
 
+export const reagentMetadata = {
+  브롬수: {
+    englishName: "Bromine water",
+    initialLabel: "적갈색",
+    finalLabel: "무색 또는 변화 없음",
+    initialColor: "#b45309",
+    accentColor: "#f59e0b",
+    detects: "이중 결합과 삼중 결합을 가진 불포화 탄화수소",
+    observation: "적갈색이 사라지는지 관찰합니다.",
+  },
+  "과망가니즈산 칼륨": {
+    englishName: "Potassium permanganate",
+    initialLabel: "보라색",
+    finalLabel: "갈색 침전 또는 변화 없음",
+    initialColor: "#7c3aed",
+    accentColor: "#8b5cf6",
+    detects: "불포화 결합이 있는 탄화수소",
+    observation: "보라색이 사라지고 갈색 침전이 생기는지 관찰합니다.",
+  },
+  "암모니아성 질산은": {
+    englishName: "Ammoniacal silver nitrate",
+    initialLabel: "무색",
+    finalLabel: "흰색 침전 또는 변화 없음",
+    initialColor: "#e2e8f0",
+    accentColor: "#94a3b8",
+    detects: "원본 코드 기준 알카인 계열 반응",
+    observation: "흰색 침전물이 생기는지 관찰합니다.",
+  },
+};
+
 export const hydrocarbonTypes = {
   alkane: {
     className: "Alkane",
@@ -71,6 +101,88 @@ export const hydrocarbonTypes = {
 
 export const typeKeys = Object.keys(hydrocarbonTypes);
 
+const reagentVisuals = {
+  alkane: {
+    브롬수: {
+      finalColor: "#b45309",
+      finalLabel: "적갈색 유지",
+      phase: "unchanged",
+      tone: "neutral",
+      status: "No reaction",
+      observation: "포화 탄화수소라 브롬수의 적갈색이 유지됩니다.",
+    },
+    "과망가니즈산 칼륨": {
+      finalColor: "#7c3aed",
+      finalLabel: "보라색 유지",
+      phase: "unchanged",
+      tone: "neutral",
+      status: "No reaction",
+      observation: "단일 결합만 있어 보라색 용액이 유지됩니다.",
+    },
+    "암모니아성 질산은": {
+      finalColor: "#e2e8f0",
+      finalLabel: "변화 없음",
+      phase: "unchanged",
+      tone: "neutral",
+      status: "No visible change",
+      observation: "침전 없이 용액이 투명하게 남습니다.",
+    },
+  },
+  alkene: {
+    브롬수: {
+      finalColor: "#f8fafc",
+      finalLabel: "무색",
+      phase: "decolorized",
+      tone: "reactive",
+      status: "Positive unsaturation test",
+      observation: "이중 결합이 반응해 적갈색이 무색으로 탈색됩니다.",
+    },
+    "과망가니즈산 칼륨": {
+      finalColor: "#92400e",
+      finalLabel: "갈색 침전",
+      phase: "precipitate",
+      tone: "reactive",
+      status: "Positive oxidation test",
+      observation: "보라색이 사라지고 갈색 침전이 나타납니다.",
+    },
+    "암모니아성 질산은": {
+      finalColor: "#e2e8f0",
+      finalLabel: "변화 없음",
+      phase: "unchanged",
+      tone: "neutral",
+      status: "No reaction",
+      observation: "원본 코드 기준으로 침전 없이 반응하지 않습니다.",
+    },
+  },
+  alkyne: {
+    브롬수: {
+      finalColor: "#fde68a",
+      finalLabel: "옅은 노란색",
+      phase: "changed",
+      tone: "reactive",
+      status: "Fast color change",
+      observation: "삼중 결합 때문에 브롬수 색이 빠르게 옅어집니다.",
+    },
+    "과망가니즈산 칼륨": {
+      finalColor: "#854d0e",
+      finalLabel: "갈색으로 변화",
+      phase: "changed",
+      tone: "reactive",
+      status: "Fast color change",
+      observation: "삼중 결합이 빠르게 반응해 용액 색이 변합니다.",
+    },
+    "암모니아성 질산은": {
+      finalColor: "#f8fafc",
+      finalLabel: "흰색 침전",
+      phase: "white-precipitate",
+      tone: "reactive",
+      status: "White precipitate",
+      observation:
+        "원본 Python 로직에 맞춰 알카인 선택 시 흰색 침전 생성을 표시합니다.",
+    },
+  },
+};
+
 const hydrocarbonNames = {
   alkane: {
     1: "메테인",
@@ -129,6 +241,50 @@ export function getHydrocarbonDetails(typeOrKey, carbonCount) {
       reagent,
       result: type.reagentResult(reagent),
     })),
+  };
+}
+
+export function getClassFlow(typeKey) {
+  const type = hydrocarbonTypes[typeKey];
+
+  return ["HydrocarbonADT", "Hydrocarbon", type?.className ?? "Unknown"];
+}
+
+export function getCombustionReaction(typeOrKey, carbonCount) {
+  const type =
+    typeof typeOrKey === "string" ? hydrocarbonTypes[typeOrKey] : typeOrKey;
+  const details = getHydrocarbonDetails(type, carbonCount);
+
+  return `${type.reactionPrefix} C${details.carbon}H${details.hCount} + ${formatNumber(
+    details.oxygen
+  )}O2 -> ${details.carbon}CO2 + ${formatNumber(details.water)}H2O`;
+}
+
+export function getReagentTestResult(typeKey, reagent, carbonCount) {
+  const type = hydrocarbonTypes[typeKey];
+  const metadata = reagentMetadata[reagent];
+  const visual = reagentVisuals[typeKey]?.[reagent] ?? {
+    finalColor: metadata?.initialColor ?? "#e2e8f0",
+    phase: "unknown",
+    tone: "neutral",
+    status: "Unknown",
+    observation: "반응 데이터가 없습니다.",
+  };
+  const details = getHydrocarbonDetails(type, carbonCount);
+
+  return {
+    reagent,
+    metadata,
+    type,
+    typeKey,
+    classFlow: getClassFlow(typeKey),
+    details,
+    formula: `C${details.carbon}H${details.hCount}`,
+    methodCall: `${type.className}.perform_test("${reagent}")`,
+    result: type.reagentResult(reagent),
+    ...visual,
+    oopConcept:
+      "같은 perform_test(reagent) 호출이 concrete class의 오버라이딩 구현에 따라 다른 관찰 결과를 반환합니다.",
   };
 }
 

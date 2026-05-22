@@ -3,7 +3,8 @@ import Link from "next/link";
 const navItems = [
   { href: "/", label: "Class Map", key: "class-map" },
   { href: "/combustion", label: "Combustion View", key: "combustion" },
-  { href: "/lab", label: "Reaction Lab", key: "lab", disabled: true },
+  { href: "/reagents", label: "Reagent Test", key: "reagents" },
+  { href: "/lab", label: "Reaction Lab", key: "lab" },
 ];
 
 export default function AppNavigation({ active }) {
@@ -17,24 +18,6 @@ export default function AppNavigation({ active }) {
           const isActive = active === item.key;
           const baseClass =
             "inline-flex min-h-10 items-center justify-center rounded-full px-4 text-sm font-semibold transition duration-300";
-
-          if (item.disabled) {
-            return (
-              <button
-                key={item.key}
-                type="button"
-                disabled
-                className={`${baseClass} cursor-not-allowed text-slate-400`}
-                aria-disabled="true"
-                title="3단계 Reaction Lab에서 추가 예정"
-              >
-                {item.label}
-                <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-normal text-slate-500">
-                  Soon
-                </span>
-              </button>
-            );
-          }
 
           return (
             <Link
