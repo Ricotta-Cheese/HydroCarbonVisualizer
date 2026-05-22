@@ -380,9 +380,65 @@ textarea {
   align-items: center;
 }
 
+.reaction-scene {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 18rem;
+  align-items: center;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.12fr) minmax(7rem, 0.54fr) minmax(0, 1fr);
+  isolation: isolate;
+  padding: 0.55rem;
+}
+
+.reaction-scene::before {
+  position: absolute;
+  inset: 0.4rem;
+  z-index: -2;
+  border-radius: 0.55rem;
+  background:
+    radial-gradient(circle at 38% 50%, color-mix(in srgb, var(--stage-accent) 10%, transparent), transparent 30%),
+    radial-gradient(circle at 66% 50%, rgba(248, 113, 113, 0.1), transparent 25%);
+  content: "";
+  opacity: 0;
+  transition: opacity 520ms ease;
+}
+
+.reaction-scene::after {
+  position: absolute;
+  top: 50%;
+  left: 49%;
+  z-index: -1;
+  width: 15rem;
+  height: 15rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--stage-accent) 12%, transparent), transparent 66%);
+  content: "";
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.74);
+  transition:
+    opacity 520ms ease,
+    transform 640ms ease;
+}
+
+.combustion-stage-step-1 .reaction-scene::before,
+.combustion-stage-step-2 .reaction-scene::before,
+.combustion-stage-step-3 .reaction-scene::before {
+  opacity: 1;
+}
+
+.combustion-stage-step-1 .reaction-scene::after,
+.combustion-stage-step-2 .reaction-scene::after,
+.combustion-stage-step-3 .reaction-scene::after {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
 .reaction-flow-line {
   position: absolute;
   top: 50%;
+  z-index: 0;
   right: 1.4rem;
   left: 1.4rem;
   height: 2px;
@@ -426,8 +482,8 @@ textarea {
 .reaction-burst {
   position: absolute;
   top: 50%;
-  left: 50%;
-  z-index: 2;
+  left: 49%;
+  z-index: 4;
   width: 5.8rem;
   height: 5.8rem;
   border-radius: 999px;
@@ -583,6 +639,25 @@ textarea {
   text-transform: uppercase;
 }
 
+.reaction-molecule .molecule-header {
+  min-height: 2.35rem;
+  align-items: flex-start;
+}
+
+.reaction-molecule-oxygen .molecule-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.molecule-product-grid .molecule-header {
+  display: grid;
+  min-height: 2.2rem;
+  align-items: start;
+  gap: 0.15rem;
+  grid-template-columns: 1fr;
+}
+
 .molecule-header strong {
   color: #0f172a;
   font-size: 1rem;
@@ -590,6 +665,11 @@ textarea {
   letter-spacing: 0;
   text-transform: none;
   white-space: nowrap;
+}
+
+.molecule-product-grid .molecule-header strong {
+  justify-self: start;
+  font-size: 0.92rem;
 }
 
 .molecule-svg {
@@ -619,6 +699,118 @@ textarea {
   height: 6.5rem;
 }
 
+.reaction-molecule {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  min-height: 12.75rem;
+  align-self: stretch;
+  padding: 0.85rem;
+}
+
+.reaction-molecule.molecule-card-active {
+  transform: none;
+}
+
+.reaction-molecule .molecule-svg {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 520ms ease,
+    filter 520ms ease,
+    transform 620ms cubic-bezier(0.18, 0.84, 0.24, 1);
+  will-change: opacity, transform;
+}
+
+.reaction-molecule-fuel {
+  grid-column: 1;
+}
+
+.reaction-molecule-oxygen {
+  grid-column: 2;
+  justify-self: center;
+  width: min(100%, 13rem);
+}
+
+.reaction-products-cluster {
+  position: relative;
+  z-index: 3;
+  grid-column: 3;
+  min-width: 0;
+  opacity: 0.3;
+  transform: translateX(0.85rem) scale(0.96);
+  transition:
+    opacity 520ms ease,
+    transform 620ms cubic-bezier(0.18, 0.84, 0.24, 1),
+    filter 520ms ease;
+}
+
+.reaction-products-cluster .molecule-product-grid {
+  align-items: center;
+}
+
+.reaction-products-cluster-active {
+  opacity: 1;
+  filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.08));
+  transform: translateX(0) scale(1);
+}
+
+.combustion-stage-step-1 .reaction-molecule-fuel.molecule-card-active {
+  transform: none;
+}
+
+.combustion-stage-step-1 .reaction-molecule-fuel .molecule-svg {
+  transform: translateX(2.2rem) scale(0.96);
+}
+
+.combustion-stage-step-1 .reaction-molecule-oxygen.molecule-card-active {
+  transform: none;
+}
+
+.combustion-stage-step-1 .reaction-molecule-oxygen .molecule-svg {
+  transform: translateX(-1.35rem) scale(1.04);
+}
+
+.combustion-stage-step-2 .reaction-molecule-fuel.molecule-card-active {
+  opacity: 1;
+  transform: none;
+}
+
+.combustion-stage-step-2 .reaction-molecule-fuel .molecule-svg {
+  opacity: 0.32;
+  transform: translateX(7rem) scale(0.72);
+}
+
+.combustion-stage-step-2 .reaction-molecule-oxygen.molecule-card-active {
+  opacity: 1;
+  transform: none;
+}
+
+.combustion-stage-step-2 .reaction-molecule-oxygen .molecule-svg {
+  opacity: 0.16;
+  transform: translateX(-2.6rem) scale(0.64);
+}
+
+.combustion-stage-step-3 .reaction-molecule-fuel.molecule-card-active {
+  opacity: 1;
+  transform: none;
+}
+
+.combustion-stage-step-3 .reaction-molecule-fuel .molecule-svg {
+  opacity: 0.08;
+  transform: translateX(8.6rem) scale(0.56);
+}
+
+.combustion-stage-step-3 .reaction-molecule-oxygen.molecule-card-active {
+  opacity: 1;
+  transform: none;
+}
+
+.combustion-stage-step-3 .reaction-molecule-oxygen .molecule-svg {
+  opacity: 0.06;
+  transform: translateX(-3.5rem) scale(0.5);
+}
+
 .fuel-molecule-core {
   transform-box: fill-box;
   transform-origin: center;
@@ -637,7 +829,7 @@ textarea {
   animation: fuel-consume 840ms ease both;
 }
 
-.reaction-zone-oxygen .molecule-card-consuming .oxygen-svg {
+.reaction-molecule-oxygen.molecule-card-consuming .oxygen-svg {
   animation: oxygen-consume 780ms ease both;
 }
 
@@ -1342,6 +1534,22 @@ textarea {
     gap: 0.75rem;
   }
 
+  .reaction-scene {
+    min-height: 11.85rem;
+    gap: 0.65rem;
+    padding: 0.2rem;
+    grid-template-columns: minmax(0, 1.16fr) minmax(6.5rem, 0.54fr) minmax(0, 1fr);
+  }
+
+  .reaction-molecule {
+    min-height: 8.3rem;
+    padding: 0.45rem;
+  }
+
+  .reaction-molecule-oxygen {
+    width: min(100%, 10.5rem);
+  }
+
   .reaction-zone {
     min-height: 8.3rem;
     padding: 0.65rem;
@@ -1524,6 +1732,50 @@ textarea {
   .combustion-stage-grid {
     min-height: auto;
     grid-template-columns: 1fr;
+  }
+
+  .reaction-scene {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 0;
+  }
+
+  .reaction-molecule,
+  .reaction-products-cluster {
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .reaction-molecule {
+    min-height: 7.8rem;
+    padding: 0;
+  }
+
+  .reaction-products-cluster {
+    transform: translateY(0.4rem) scale(0.97);
+  }
+
+  .reaction-products-cluster-active {
+    transform: translateY(0) scale(1);
+  }
+
+  .combustion-stage-step-1 .reaction-molecule-fuel.molecule-card-active,
+  .combustion-stage-step-1 .reaction-molecule-oxygen.molecule-card-active,
+  .combustion-stage-step-2 .reaction-molecule-fuel.molecule-card-active,
+  .combustion-stage-step-2 .reaction-molecule-oxygen.molecule-card-active,
+  .combustion-stage-step-3 .reaction-molecule-fuel.molecule-card-active,
+  .combustion-stage-step-3 .reaction-molecule-oxygen.molecule-card-active {
+    transform: none;
+  }
+
+  .combustion-stage-step-1 .reaction-molecule-fuel .molecule-svg,
+  .combustion-stage-step-1 .reaction-molecule-oxygen .molecule-svg,
+  .combustion-stage-step-2 .reaction-molecule-fuel .molecule-svg,
+  .combustion-stage-step-2 .reaction-molecule-oxygen .molecule-svg,
+  .combustion-stage-step-3 .reaction-molecule-fuel .molecule-svg,
+  .combustion-stage-step-3 .reaction-molecule-oxygen .molecule-svg {
+    transform: none;
   }
 
   .reaction-flow-line {

@@ -622,52 +622,48 @@ function MoleculeStage({ details, activeStep, tone, typeKey }) {
       key={`${typeKey}-${details.carbon}-${details.hCount}`}
       className={`combustion-stage combustion-stage-${tone} combustion-stage-step-${activeStep}`}
     >
-      <div className="reaction-flow-line" aria-hidden="true" />
-      <ReactionBurst activeStep={activeStep} />
-      <div className="combustion-stage-grid">
-        <div
-          className={`reaction-zone fuel-zone reaction-zone-fuel ${
-            activeStep >= 2 ? "reaction-zone-release reaction-zone-consuming" : ""
+      <div className="reaction-scene" aria-label="Combustion reaction scene">
+        <div className="reaction-flow-line" aria-hidden="true" />
+        <ReactionBurst activeStep={activeStep} />
+        <MoleculeCard
+          active
+          className={`reaction-molecule reaction-molecule-fuel ${
+            activeStep >= 2 ? "molecule-card-consuming" : ""
           }`}
-        >
-          <MoleculeCard
-            active
-            className={activeStep >= 2 ? "molecule-card-consuming" : ""}
-            label="Fuel molecule"
-            caption={<ChemicalFormula carbon={details.carbon} hydrogen={details.hCount} />}
-          >
-            <HydrocarbonMoleculeSvg
-              activeStep={activeStep}
-              carbonCount={details.carbon}
-              typeKey={typeKey}
+          label="Fuel molecule"
+          caption={
+            <ChemicalFormula
+              carbon={details.carbon}
+              hydrogen={details.hCount}
             />
-          </MoleculeCard>
-        </div>
-
-        <div
-          className={`reaction-zone oxygen-zone reaction-zone-oxygen ${
-            activeStep >= 1 ? "reaction-zone-active" : ""
-          } ${activeStep >= 2 ? "reaction-zone-consuming" : ""
-          }`}
+          }
         >
-          <MoleculeCard
-            active={activeStep >= 1}
-            className={activeStep >= 2 ? "molecule-card-consuming" : ""}
-            label="Oxygen input"
-            caption={
-              <>
-                {formatNumber(details.oxygen)} O<sub>2</sub>
-              </>
-            }
-            delay={80}
-          >
-            <DiatomicOxygenSvg />
-          </MoleculeCard>
-        </div>
+          <HydrocarbonMoleculeSvg
+            activeStep={activeStep}
+            carbonCount={details.carbon}
+            typeKey={typeKey}
+          />
+        </MoleculeCard>
+
+        <MoleculeCard
+          active={activeStep >= 1}
+          className={`reaction-molecule reaction-molecule-oxygen ${
+            activeStep >= 2 ? "molecule-card-consuming" : ""
+          }`}
+          label="Oxygen input"
+          caption={
+            <>
+              {formatNumber(details.oxygen)} O<sub>2</sub>
+            </>
+          }
+          delay={80}
+        >
+          <DiatomicOxygenSvg />
+        </MoleculeCard>
 
         <div
-          className={`reaction-zone product-zone reaction-zone-products ${
-            activeStep >= 2 ? "reaction-zone-active reaction-zone-producing" : ""
+          className={`reaction-products-cluster ${
+            activeStep >= 2 ? "reaction-products-cluster-active" : ""
           }`}
         >
           <div className="molecule-product-grid">
