@@ -423,6 +423,70 @@ textarea {
   transform: translateY(-50%) scaleX(1);
 }
 
+.reaction-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 5.8rem;
+  height: 5.8rem;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.45);
+}
+
+.reaction-burst::before,
+.reaction-burst::after,
+.reaction-burst span {
+  position: absolute;
+  inset: 50%;
+  border-radius: 999px;
+  content: "";
+}
+
+.reaction-burst::before {
+  width: 3.6rem;
+  height: 3.6rem;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--stage-accent) 34%, #ffffff) 0 18%, transparent 56%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.95), transparent 68%);
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--stage-accent) 34%, transparent),
+    0 0 48px rgba(251, 191, 36, 0.18);
+  transform: translate(-50%, -50%);
+}
+
+.reaction-burst::after {
+  width: 5.2rem;
+  height: 5.2rem;
+  border: 1px solid color-mix(in srgb, var(--stage-accent) 34%, transparent);
+  transform: translate(-50%, -50%);
+}
+
+.reaction-burst span {
+  width: 0.42rem;
+  height: 0.42rem;
+  background: color-mix(in srgb, var(--stage-accent) 52%, #fbbf24);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--stage-accent) 45%, transparent);
+}
+
+.reaction-burst span:nth-child(1) {
+  transform: translate(-2.1rem, -1.3rem);
+}
+
+.reaction-burst span:nth-child(2) {
+  transform: translate(1.6rem, -0.2rem);
+}
+
+.reaction-burst span:nth-child(3) {
+  transform: translate(-0.4rem, 1.75rem);
+}
+
+.reaction-burst-active {
+  animation: reaction-burst 980ms ease-out both;
+}
+
 .reaction-zone {
   position: relative;
   display: flex;
@@ -451,7 +515,32 @@ textarea {
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05);
 }
 
-.smiles-molecule-card {
+.combustion-stage-step-1 .reaction-zone-fuel {
+  transform: translateX(0.25rem);
+}
+
+.combustion-stage-step-1 .reaction-zone-oxygen {
+  transform: translateX(-0.25rem);
+}
+
+.reaction-zone-consuming {
+  border-color: color-mix(in srgb, var(--stage-accent) 38%, #cbd5e1);
+  background:
+    radial-gradient(circle at 68% 48%, color-mix(in srgb, var(--stage-accent) 12%, transparent), transparent 38%),
+    rgba(255, 255, 255, 0.68);
+}
+
+.reaction-zone-producing {
+  border-color: color-mix(in srgb, var(--stage-accent) 58%, #cbd5e1);
+  background:
+    radial-gradient(circle at 32% 42%, color-mix(in srgb, var(--stage-accent) 12%, transparent), transparent 38%),
+    rgba(255, 255, 255, 0.78);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--stage-accent) 24%, transparent),
+    0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.molecule-card {
   display: grid;
   width: 100%;
   min-height: 10rem;
@@ -465,13 +554,23 @@ textarea {
     filter 420ms ease;
 }
 
-.smiles-molecule-card-active {
+.molecule-card-active {
   opacity: 1;
   filter: drop-shadow(0 14px 24px rgba(15, 23, 42, 0.08));
   transform: translateY(0) scale(1);
 }
 
-.smiles-molecule-header {
+.molecule-card-consuming .molecule-header {
+  opacity: 0.62;
+}
+
+.molecule-card-product.molecule-card-active {
+  filter:
+    drop-shadow(0 12px 20px rgba(15, 23, 42, 0.08))
+    drop-shadow(0 0 18px color-mix(in srgb, var(--stage-accent) 16%, transparent));
+}
+
+.molecule-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -484,7 +583,7 @@ textarea {
   text-transform: uppercase;
 }
 
-.smiles-molecule-header strong {
+.molecule-header strong {
   color: #0f172a;
   font-size: 1rem;
   font-weight: 900;
@@ -493,37 +592,181 @@ textarea {
   white-space: nowrap;
 }
 
-.smiles-molecule-svg {
+.molecule-svg {
   display: block;
   width: 100%;
-  height: 8rem;
+  height: 8.4rem;
   overflow: visible;
 }
 
-.smiles-molecule-svg text {
+.molecule-svg text {
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 800;
 }
 
-.smiles-molecule-error {
-  color: #be123c;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.smiles-product-grid {
+.molecule-product-grid {
   display: grid;
   width: 100%;
   gap: 0.65rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.smiles-product-grid .smiles-molecule-card {
+.molecule-product-grid .molecule-card {
   min-height: 9rem;
 }
 
-.smiles-product-grid .smiles-molecule-svg {
+.molecule-product-grid .molecule-svg {
   height: 6.5rem;
+}
+
+.fuel-molecule-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    filter 420ms ease,
+    opacity 520ms ease,
+    transform 620ms ease;
+}
+
+.fuel-molecule-core-energized {
+  animation: fuel-backbone-shake 620ms ease-in-out 1;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--stage-accent) 48%, transparent));
+}
+
+.hydrocarbon-svg-reacted .fuel-molecule-core {
+  animation: fuel-consume 840ms ease both;
+}
+
+.reaction-zone-oxygen .molecule-card-consuming .oxygen-svg {
+  animation: oxygen-consume 780ms ease both;
+}
+
+.product-svg-formed .molecule-bond-line,
+.product-svg-formed .molecule-atom-node {
+  animation: product-form 720ms cubic-bezier(0.18, 0.84, 0.24, 1) both;
+}
+
+.product-svg-formed .molecule-atom-node:nth-of-type(2),
+.product-svg-formed .molecule-bond-line:nth-of-type(2) {
+  animation-delay: 80ms;
+}
+
+.product-svg-formed .molecule-atom-node:nth-of-type(3),
+.product-svg-formed .molecule-bond-line:nth-of-type(3) {
+  animation-delay: 140ms;
+}
+
+.molecule-bond-line {
+  fill: none;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.molecule-carbon-bond {
+  stroke: #0f172a;
+  stroke-width: 3.2;
+}
+
+.molecule-carbon-bond.molecule-bond-order-2,
+.molecule-carbon-bond.molecule-bond-order-3 {
+  stroke-width: 2.45;
+}
+
+.molecule-hydrogen-bond {
+  opacity: 0.72;
+  stroke: #94a3b8;
+  stroke-width: 1.4;
+}
+
+.molecule-oxygen-bond,
+.molecule-product-bond,
+.molecule-water-bond {
+  stroke: #e7a5a1;
+  stroke-width: 2.2;
+}
+
+.molecule-product-bond {
+  stroke: #a8b1bf;
+}
+
+.molecule-water-bond {
+  opacity: 0.85;
+  stroke-width: 1.8;
+}
+
+.molecule-atom-label {
+  dominant-baseline: middle;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.molecule-atom-node {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.molecule-carbon-node {
+  fill: #0f172a;
+  stroke: #020617;
+  stroke-width: 1.3;
+}
+
+.molecule-carbon-label {
+  fill: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.molecule-carbon-node-small {
+  stroke-width: 1.1;
+}
+
+.molecule-carbon-label-small {
+  font-size: 12px;
+}
+
+.molecule-hydrogen-node {
+  fill: #ffffff;
+  stroke: #cbd5e1;
+  stroke-width: 1.35;
+}
+
+.molecule-hydrogen-label {
+  fill: #64748b;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.molecule-oxygen-node {
+  fill: #fff7f6;
+  stroke: #f0aaa6;
+  stroke-width: 1.6;
+}
+
+.molecule-oxygen-label {
+  fill: #e88580;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.molecule-ghost-node {
+  opacity: 0;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.molecule-carbon-ghost-node {
+  animation: carbon-transfer 1100ms ease-out both;
+  fill: color-mix(in srgb, var(--stage-accent) 24%, #0f172a);
+}
+
+.molecule-hydrogen-ghost-node {
+  animation: hydrogen-transfer 1050ms ease-out both;
+  fill: #ffffff;
+  stroke: color-mix(in srgb, var(--stage-accent) 42%, #cbd5e1);
+  stroke-width: 1.2;
 }
 
 .reaction-zone-label {
@@ -1104,23 +1347,23 @@ textarea {
     padding: 0.65rem;
   }
 
-  .smiles-molecule-card {
-    min-height: 7.2rem;
+  .molecule-card {
+    min-height: 7.4rem;
   }
 
-  .smiles-molecule-svg {
-    height: 5.4rem;
+  .molecule-svg {
+    height: 6.1rem;
   }
 
-  .smiles-product-grid .smiles-molecule-card {
+  .molecule-product-grid .molecule-card {
     min-height: 7rem;
   }
 
-  .smiles-product-grid .smiles-molecule-svg {
-    height: 4.8rem;
+  .molecule-product-grid .molecule-svg {
+    height: 5.2rem;
   }
 
-  .smiles-molecule-header strong {
+  .molecule-header strong {
     font-size: 0.85rem;
   }
 
@@ -1149,6 +1392,129 @@ textarea {
   }
 }
 
+@keyframes reaction-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.45) rotate(0deg);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  56% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.05) rotate(16deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.38) rotate(28deg);
+  }
+}
+
+@keyframes fuel-backbone-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-1.8px);
+  }
+
+  50% {
+    transform: translateX(1.8px);
+  }
+
+  75% {
+    transform: translateX(-0.9px);
+  }
+}
+
+@keyframes fuel-consume {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  38% {
+    opacity: 0.92;
+    transform: translate(0.45rem, -0.08rem) scale(0.95);
+  }
+
+  100% {
+    opacity: 0.16;
+    transform: translate(2.1rem, 0) scale(0.72);
+  }
+}
+
+@keyframes oxygen-consume {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  42% {
+    opacity: 0.82;
+    transform: translate(-0.8rem, 0) scale(0.9);
+  }
+
+  100% {
+    opacity: 0.12;
+    transform: translate(-2.1rem, 0) scale(0.62);
+  }
+}
+
+@keyframes product-form {
+  0% {
+    opacity: 0;
+    transform: translateX(-1rem) scale(0.66);
+  }
+
+  55% {
+    opacity: 1;
+    transform: translateX(0.12rem) scale(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes carbon-transfer {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.9);
+  }
+
+  18% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--ghost-x), var(--ghost-y)) scale(0.5);
+  }
+}
+
+@keyframes hydrogen-transfer {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.9);
+  }
+
+  18% {
+    opacity: 0.74;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--ghost-x), var(--ghost-y)) scale(0.55);
+  }
+}
+
 @media (max-width: 767px) {
   .combustion-stage {
     min-height: auto;
@@ -1173,7 +1539,7 @@ textarea {
     min-height: 7.5rem;
   }
 
-  .smiles-product-grid {
+  .molecule-product-grid {
     grid-template-columns: 1fr;
   }
 

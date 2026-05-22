@@ -104,107 +104,518 @@ function ReactionEquation({ details, activeStep }) {
   );
 }
 
-function getHydrocarbonSmiles(typeKey, carbonCount) {
-  if (carbonCount <= 1) {
-    return "C";
-  }
+const MOLECULE_SVG_WIDTH = 380;
+const MOLECULE_BASE_Y = 96;
+const CARBON_RADIUS = 16;
+const HYDROGEN_RADIUS = 8;
+const OXYGEN_RADIUS = 18;
 
-  const tail = "C".repeat(Math.max(carbonCount - 2, 0));
-
-  if (typeKey === "alkene") {
-    return `C=C${tail}`;
-  }
-
-  if (typeKey === "alkyne") {
-    return `C#C${tail}`;
-  }
-
-  return "C".repeat(carbonCount);
-}
-
-function SmilesMolecule({ smiles, active = true, label, caption, delay = 0 }) {
-  const svgRef = useRef(null);
-  const [renderError, setRenderError] = useState("");
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    async function renderMolecule() {
-      if (!svgRef.current) {
-        return;
-      }
-
-      try {
-        await import("smiles-drawer/dist/smiles-drawer.min.js");
-        const SmilesDrawer = window.SmilesDrawer;
-
-        if (!SmilesDrawer) {
-          throw new Error("SmilesDrawer 초기화 실패");
-        }
-        const drawer = new SmilesDrawer.SvgDrawer({
-          width: 260,
-          height: 140,
-          bondThickness: 1.4,
-          bondLength: 34,
-          bondSpacing: 5,
-          fontSizeLarge: 12,
-          fontSizeSmall: 4,
-          padding: 12,
-          showCarbons: "all",
-          explicitHydrogens: true,
-          compactDrawing: false,
-        });
-
-        svgRef.current.innerHTML = "";
-        SmilesDrawer.parse(
-          smiles,
-          (tree) => {
-            if (isCancelled || !svgRef.current) {
-              return;
-            }
-
-            drawer.draw(tree, svgRef.current, "light");
-            setRenderError("");
-          },
-          (error) => {
-            if (!isCancelled) {
-              setRenderError(error.message ?? "SMILES 렌더링 실패");
-            }
-          }
-        );
-      } catch (error) {
-        if (!isCancelled) {
-          setRenderError(error.message ?? "SmilesDrawer 로드 실패");
-        }
-      }
+function getCarbonBondOrders(typeKey, carbonCount) {
+  return Array.from({ length: Math.max(carbonCount - 1, 0) }, (_, index) => {
+    if (index === 0 && typeKey === "alkene") {
+      return 2;
     }
 
-    renderMolecule();
+    if (index === 0 && typeKey === "alkyne") {
+      return 3;
+    }
 
-    return () => {
-      isCancelled = true;
+    return 1;
+  });
+}
+
+function getCarbonPositions(carbonCount) {
+  if (carbonCount === 1) {
+    return [{ x: MOLECULE_SVG_WIDTH / 2, y: MOLECULE_BASE_Y }];
+  }
+
+  const chainWidth = Math.min(292, Math.max(112, (carbonCount - 1) * 44));
+  const step = chainWidth / (carbonCount - 1);
+  const startX = (MOLECULE_SVG_WIDTH - chainWidth) / 2;
+  const zigzag = carbonCount <= 2 ? 0 : 10;
+
+  return Array.from({ length: carbonCount }, (_, index) => ({
+    x: startX + step * index,
+    y: MOLECULE_BASE_Y + (index % 2 === 0 ? -zigzag : zigzag),
+  }));
+}
+
+function getHydrogenOffsets({ carbonCount, hCount, index, y }) {
+  if (hCount <= 0) {
+    return [];
+  }
+
+  if (carbonCount === 1) {
+    return [
+      { dx: 0, dy: -38 },
+      { dx: 38, dy: 0 },
+      { dx: 0, dy: 38 },
+      { dx: -38, dy: 0 },
+    ].slice(0, hCount);
+  }
+
+  const isFirst = index === 0;
+  const isLast = index === carbonCount - 1;
+
+  if (isFirst || isLast) {
+    const outward = isFirst ? -1 : 1;
+
+    if (hCount === 3) {
+      return [
+        { dx: outward * 34, dy: 0 },
+        { dx: outward * 24, dy: -29 },
+        { dx: outward * 24, dy: 29 },
+      ];
+    }
+
+    if (hCount === 2) {
+      return [
+        { dx: outward * 31, dy: -20 },
+        { dx: outward * 31, dy: 20 },
+      ];
+    }
+
+    return [{ dx: outward * 35, dy: 0 }];
+  }
+
+  if (hCount === 2) {
+    return [
+      { dx: 0, dy: -34 },
+      { dx: 0, dy: 34 },
+    ];
+  }
+
+  return [{ dx: 0, dy: y <= MOLECULE_BASE_Y ? -34 : 34 }];
+}
+
+function getHydrocarbonModel(typeKey, carbonCount) {
+  const bondOrders = getCarbonBondOrders(typeKey, carbonCount);
+  const positions = getCarbonPositions(carbonCount);
+  const carbons = positions.map((position, index) => {
+    const leftBondOrder = index > 0 ? bondOrders[index - 1] : 0;
+    const rightBondOrder = index < bondOrders.length ? bondOrders[index] : 0;
+    const hCount = Math.max(0, 4 - leftBondOrder - rightBondOrder);
+
+    return {
+      ...position,
+      hCount,
+      id: `c-${index}`,
+      index,
     };
-  }, [smiles]);
+  });
+  const hydrogens = carbons.flatMap((carbon) =>
+    getHydrogenOffsets({
+      carbonCount,
+      hCount: carbon.hCount,
+      index: carbon.index,
+      y: carbon.y,
+    }).map((offset, hydrogenIndex) => ({
+      x: carbon.x + offset.dx,
+      y: carbon.y + offset.dy,
+      carbon,
+      id: `h-${carbon.index}-${hydrogenIndex}`,
+    }))
+  );
+  const bonds = bondOrders.map((order, index) => ({
+    from: carbons[index],
+    id: `bond-${index}`,
+    order,
+    to: carbons[index + 1],
+  }));
+  const atoms = [...carbons, ...hydrogens];
+  const minX = Math.min(...atoms.map((atom) => atom.x)) - 24;
+  const maxX = Math.max(...atoms.map((atom) => atom.x)) + 24;
+  const minY = Math.min(...atoms.map((atom) => atom.y)) - 24;
+  const maxY = Math.max(...atoms.map((atom) => atom.y)) + 24;
 
+  return {
+    bonds,
+    carbons,
+    hydrogens,
+    viewBox: `${minX} ${minY} ${maxX - minX} ${maxY - minY}`,
+  };
+}
+
+function MoleculeBond({
+  className = "",
+  from,
+  id,
+  order = 1,
+  to,
+  trimEnd = 0,
+  trimStart = 0,
+}) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy);
+
+  if (length === 0) {
+    return null;
+  }
+
+  const ux = dx / length;
+  const uy = dy / length;
+  const px = -uy;
+  const py = ux;
+  const offsets = {
+    1: [0],
+    2: [-4.3, 4.3],
+    3: [-6, 0, 6],
+  }[order];
+
+  return offsets.map((offset, index) => (
+    <line
+      key={`${id}-${index}`}
+      className={`molecule-bond-line molecule-bond-order-${order} ${className}`.trim()}
+      x1={from.x + ux * trimStart + px * offset}
+      x2={to.x - ux * trimEnd + px * offset}
+      y1={from.y + uy * trimStart + py * offset}
+      y2={to.y - uy * trimEnd + py * offset}
+    />
+  ));
+}
+
+function MoleculeAtom({
+  label,
+  labelClassName = "",
+  nodeClassName = "",
+  radius,
+  x,
+  y,
+}) {
+  return (
+    <g className="molecule-atom-node">
+      <circle className={nodeClassName} cx={x} cy={y} r={radius} />
+      <text
+        className={`molecule-atom-label ${labelClassName}`.trim()}
+        x={x}
+        y={y}
+      >
+        {label}
+      </text>
+    </g>
+  );
+}
+
+function MoleculeCard({
+  active = true,
+  caption,
+  children,
+  className = "",
+  delay = 0,
+  label,
+}) {
   return (
     <div
-      className={`smiles-molecule-card ${
-        active ? "smiles-molecule-card-active" : ""
-      }`}
+      className={`molecule-card ${className} ${
+        active ? "molecule-card-active" : ""
+      }`.trim()}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      <div className="smiles-molecule-header">
+      <div className="molecule-header">
         <span>{label}</span>
         <strong>{caption}</strong>
       </div>
-      <svg ref={svgRef} className="smiles-molecule-svg" role="img" />
-      {renderError ? <p className="smiles-molecule-error">{renderError}</p> : null}
+      {children}
     </div>
   );
 }
 
+function ReactionBurst({ activeStep }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={`reaction-burst ${
+        activeStep >= 2 ? "reaction-burst-active" : ""
+      }`}
+    >
+      <span />
+      <span />
+      <span />
+    </div>
+  );
+}
+
+function HydrocarbonMoleculeSvg({ activeStep, carbonCount, typeKey }) {
+  const model = useMemo(
+    () => getHydrocarbonModel(typeKey, carbonCount),
+    [carbonCount, typeKey]
+  );
+  const carbonGhostActive = activeStep >= 2;
+  const hydrogenGhostActive = activeStep >= 3;
+
+  return (
+    <svg
+      aria-label={`${carbonCount} carbon hydrocarbon structure`}
+      className={`molecule-svg hydrocarbon-svg ${
+        activeStep >= 1 ? "hydrocarbon-svg-reacting" : ""
+      } ${activeStep >= 2 ? "hydrocarbon-svg-reacted" : ""}`.trim()}
+      role="img"
+      viewBox={model.viewBox}
+    >
+      <g
+        className={`fuel-molecule-core ${
+          activeStep >= 1 ? "fuel-molecule-core-energized" : ""
+        }`}
+      >
+        <g>
+          {model.hydrogens.map((hydrogen) => (
+            <MoleculeBond
+              key={`${hydrogen.id}-bond`}
+              className="molecule-hydrogen-bond"
+              from={hydrogen.carbon}
+              id={`${hydrogen.id}-bond`}
+              to={hydrogen}
+              trimEnd={HYDROGEN_RADIUS - 1}
+              trimStart={CARBON_RADIUS - 1}
+            />
+          ))}
+        </g>
+        <g>
+          {model.bonds.map((bond) => (
+            <MoleculeBond
+              key={bond.id}
+              className="molecule-carbon-bond"
+              from={bond.from}
+              id={bond.id}
+              order={bond.order}
+              to={bond.to}
+              trimEnd={CARBON_RADIUS}
+              trimStart={CARBON_RADIUS}
+            />
+          ))}
+        </g>
+        <g>
+          {model.hydrogens.map((hydrogen) => (
+            <MoleculeAtom
+              key={hydrogen.id}
+              label="H"
+              labelClassName="molecule-hydrogen-label"
+              nodeClassName="molecule-hydrogen-node"
+              radius={HYDROGEN_RADIUS}
+              x={hydrogen.x}
+              y={hydrogen.y}
+            />
+          ))}
+        </g>
+        <g>
+          {model.carbons.map((carbon) => (
+            <MoleculeAtom
+              key={carbon.id}
+              label="C"
+              labelClassName="molecule-carbon-label"
+              nodeClassName="molecule-carbon-node"
+              radius={CARBON_RADIUS}
+              x={carbon.x}
+              y={carbon.y}
+            />
+          ))}
+        </g>
+      </g>
+
+      {carbonGhostActive ? (
+        <g aria-hidden="true" className="molecule-ghosts molecule-carbon-ghosts">
+          {model.carbons.map((carbon) => (
+            <circle
+              key={`${carbon.id}-ghost`}
+              className="molecule-ghost-node molecule-carbon-ghost-node"
+              cx={carbon.x}
+              cy={carbon.y}
+              r={CARBON_RADIUS}
+              style={{
+                "--ghost-x": `${106 + carbon.index * 3}px`,
+                "--ghost-y": `${carbon.y <= MOLECULE_BASE_Y ? -12 : 12}px`,
+                animationDelay: `${carbon.index * 45}ms`,
+              }}
+            />
+          ))}
+        </g>
+      ) : null}
+
+      {hydrogenGhostActive ? (
+        <g
+          aria-hidden="true"
+          className="molecule-ghosts molecule-hydrogen-ghosts"
+        >
+          {model.hydrogens.map((hydrogen, index) => (
+            <circle
+              key={`${hydrogen.id}-ghost`}
+              className="molecule-ghost-node molecule-hydrogen-ghost-node"
+              cx={hydrogen.x}
+              cy={hydrogen.y}
+              r={HYDROGEN_RADIUS}
+              style={{
+                "--ghost-x": `${116 + (index % 5) * 5}px`,
+                "--ghost-y": `${34 + (index % 3) * 5}px`,
+                animationDelay: `${(index % 12) * 32}ms`,
+              }}
+            />
+          ))}
+        </g>
+      ) : null}
+    </svg>
+  );
+}
+
+function DiatomicOxygenSvg() {
+  const left = { x: 92, y: 72 };
+  const right = { x: 168, y: 72 };
+
+  return (
+    <svg
+      aria-label="oxygen molecule"
+      className="molecule-svg molecule-product-svg oxygen-svg"
+      role="img"
+      viewBox="0 0 260 150"
+    >
+      <MoleculeBond
+        className="molecule-oxygen-bond"
+        from={left}
+        id="oxygen-bond"
+        order={2}
+        to={right}
+        trimEnd={OXYGEN_RADIUS}
+        trimStart={OXYGEN_RADIUS}
+      />
+      <MoleculeAtom
+        label="O"
+        labelClassName="molecule-oxygen-label"
+        nodeClassName="molecule-oxygen-node"
+        radius={OXYGEN_RADIUS}
+        x={left.x}
+        y={left.y}
+      />
+      <MoleculeAtom
+        label="O"
+        labelClassName="molecule-oxygen-label"
+        nodeClassName="molecule-oxygen-node"
+        radius={OXYGEN_RADIUS}
+        x={right.x}
+        y={right.y}
+      />
+    </svg>
+  );
+}
+
+function CarbonDioxideSvg({ formed }) {
+  const leftOxygen = { x: 55, y: 74 };
+  const carbon = { x: 130, y: 74 };
+  const rightOxygen = { x: 205, y: 74 };
+
+  return (
+    <svg
+      aria-label="carbon dioxide molecule"
+      className={`molecule-svg molecule-product-svg product-svg ${
+        formed ? "product-svg-formed" : ""
+      }`.trim()}
+      role="img"
+      viewBox="0 0 260 150"
+    >
+      <MoleculeBond
+        className="molecule-product-bond"
+        from={leftOxygen}
+        id="co2-left-bond"
+        order={2}
+        to={carbon}
+        trimEnd={CARBON_RADIUS}
+        trimStart={OXYGEN_RADIUS}
+      />
+      <MoleculeBond
+        className="molecule-product-bond"
+        from={carbon}
+        id="co2-right-bond"
+        order={2}
+        to={rightOxygen}
+        trimEnd={OXYGEN_RADIUS}
+        trimStart={CARBON_RADIUS}
+      />
+      <MoleculeAtom
+        label="O"
+        labelClassName="molecule-oxygen-label"
+        nodeClassName="molecule-oxygen-node"
+        radius={OXYGEN_RADIUS}
+        x={leftOxygen.x}
+        y={leftOxygen.y}
+      />
+      <MoleculeAtom
+        label="C"
+        labelClassName="molecule-carbon-label molecule-carbon-label-small"
+        nodeClassName="molecule-carbon-node molecule-carbon-node-small"
+        radius={CARBON_RADIUS}
+        x={carbon.x}
+        y={carbon.y}
+      />
+      <MoleculeAtom
+        label="O"
+        labelClassName="molecule-oxygen-label"
+        nodeClassName="molecule-oxygen-node"
+        radius={OXYGEN_RADIUS}
+        x={rightOxygen.x}
+        y={rightOxygen.y}
+      />
+    </svg>
+  );
+}
+
+function WaterSvg({ formed }) {
+  const oxygen = { x: 130, y: 82 };
+  const leftHydrogen = { x: 82, y: 48 };
+  const rightHydrogen = { x: 178, y: 48 };
+
+  return (
+    <svg
+      aria-label="water molecule"
+      className={`molecule-svg molecule-product-svg product-svg ${
+        formed ? "product-svg-formed" : ""
+      }`.trim()}
+      role="img"
+      viewBox="0 0 260 150"
+    >
+      <MoleculeBond
+        className="molecule-water-bond"
+        from={oxygen}
+        id="water-left-bond"
+        to={leftHydrogen}
+        trimEnd={HYDROGEN_RADIUS}
+        trimStart={OXYGEN_RADIUS}
+      />
+      <MoleculeBond
+        className="molecule-water-bond"
+        from={oxygen}
+        id="water-right-bond"
+        to={rightHydrogen}
+        trimEnd={HYDROGEN_RADIUS}
+        trimStart={OXYGEN_RADIUS}
+      />
+      <MoleculeAtom
+        label="H"
+        labelClassName="molecule-hydrogen-label"
+        nodeClassName="molecule-hydrogen-node"
+        radius={HYDROGEN_RADIUS}
+        x={leftHydrogen.x}
+        y={leftHydrogen.y}
+      />
+      <MoleculeAtom
+        label="O"
+        labelClassName="molecule-oxygen-label"
+        nodeClassName="molecule-oxygen-node"
+        radius={OXYGEN_RADIUS}
+        x={oxygen.x}
+        y={oxygen.y}
+      />
+      <MoleculeAtom
+        label="H"
+        labelClassName="molecule-hydrogen-label"
+        nodeClassName="molecule-hydrogen-node"
+        radius={HYDROGEN_RADIUS}
+        x={rightHydrogen.x}
+        y={rightHydrogen.y}
+      />
+    </svg>
+  );
+}
+
 function MoleculeStage({ details, activeStep, tone, typeKey }) {
-  const fuelSmiles = getHydrocarbonSmiles(typeKey, details.carbon);
 
   return (
     <div
@@ -212,28 +623,36 @@ function MoleculeStage({ details, activeStep, tone, typeKey }) {
       className={`combustion-stage combustion-stage-${tone} combustion-stage-step-${activeStep}`}
     >
       <div className="reaction-flow-line" aria-hidden="true" />
+      <ReactionBurst activeStep={activeStep} />
       <div className="combustion-stage-grid">
         <div
-          className={`reaction-zone fuel-zone ${
-            activeStep >= 2 ? "reaction-zone-release" : ""
+          className={`reaction-zone fuel-zone reaction-zone-fuel ${
+            activeStep >= 2 ? "reaction-zone-release reaction-zone-consuming" : ""
           }`}
         >
-          <SmilesMolecule
-            smiles={fuelSmiles}
+          <MoleculeCard
             active
+            className={activeStep >= 2 ? "molecule-card-consuming" : ""}
             label="Fuel molecule"
             caption={<ChemicalFormula carbon={details.carbon} hydrogen={details.hCount} />}
-          />
+          >
+            <HydrocarbonMoleculeSvg
+              activeStep={activeStep}
+              carbonCount={details.carbon}
+              typeKey={typeKey}
+            />
+          </MoleculeCard>
         </div>
 
         <div
-          className={`reaction-zone oxygen-zone ${
+          className={`reaction-zone oxygen-zone reaction-zone-oxygen ${
             activeStep >= 1 ? "reaction-zone-active" : ""
+          } ${activeStep >= 2 ? "reaction-zone-consuming" : ""
           }`}
         >
-          <SmilesMolecule
-            smiles="O=O"
+          <MoleculeCard
             active={activeStep >= 1}
+            className={activeStep >= 2 ? "molecule-card-consuming" : ""}
             label="Oxygen input"
             caption={
               <>
@@ -241,18 +660,20 @@ function MoleculeStage({ details, activeStep, tone, typeKey }) {
               </>
             }
             delay={80}
-          />
+          >
+            <DiatomicOxygenSvg />
+          </MoleculeCard>
         </div>
 
         <div
-          className={`reaction-zone product-zone ${
-            activeStep >= 2 ? "reaction-zone-active" : ""
+          className={`reaction-zone product-zone reaction-zone-products ${
+            activeStep >= 2 ? "reaction-zone-active reaction-zone-producing" : ""
           }`}
         >
-          <div className="smiles-product-grid">
-            <SmilesMolecule
-              smiles="O=C=O"
+          <div className="molecule-product-grid">
+            <MoleculeCard
               active={activeStep >= 2}
+              className="molecule-card-product"
               label="Carbon dioxide"
               caption={
                 <>
@@ -260,10 +681,12 @@ function MoleculeStage({ details, activeStep, tone, typeKey }) {
                 </>
               }
               delay={120}
-            />
-            <SmilesMolecule
-              smiles="[H]O[H]"
+            >
+              <CarbonDioxideSvg formed={activeStep >= 2} />
+            </MoleculeCard>
+            <MoleculeCard
               active={activeStep >= 3}
+              className="molecule-card-product"
               label="Water"
               caption={
                 <>
@@ -271,7 +694,9 @@ function MoleculeStage({ details, activeStep, tone, typeKey }) {
                 </>
               }
               delay={180}
-            />
+            >
+              <WaterSvg formed={activeStep >= 3} />
+            </MoleculeCard>
           </div>
         </div>
       </div>
