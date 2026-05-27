@@ -10,14 +10,14 @@ const navItems = [
 export default function AppNavigation({ active }) {
   return (
     <nav
-      className="mx-auto mb-8 flex w-fit max-w-full justify-center rounded-full border border-slate-200 bg-white/90 p-1 shadow-[0_18px_55px_rgba(15,23,42,0.10)] backdrop-blur-xl"
+      className="mx-auto mb-8 flex w-fit max-w-full justify-center rounded-[1.6rem] border border-slate-200 bg-white/90 p-1 shadow-[0_18px_55px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:rounded-full"
       aria-label="Primary navigation"
     >
-      <div className="flex max-w-full flex-wrap justify-center gap-1">
+      <div className="grid max-w-full grid-cols-1 gap-1 sm:flex sm:flex-wrap sm:justify-center">
         {navItems.map((item) => {
           const isActive = active === item.key;
           const baseClass =
-            "inline-flex min-h-10 items-center justify-center rounded-full px-4 text-sm font-semibold transition duration-300";
+            "inline-flex min-h-10 min-w-0 items-center justify-center rounded-full px-4 text-center text-xs font-semibold leading-tight transition duration-300 sm:text-sm";
 
           return (
             <Link

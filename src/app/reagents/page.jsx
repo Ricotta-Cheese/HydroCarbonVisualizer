@@ -359,8 +359,8 @@ export default function ReagentsPage() {
                   {selectedType.sampleName} + {selectedReagent}
                 </h2>
                 <p className="korean-keep mt-3 max-w-2xl text-base leading-7 text-slate-600">
-                  {selectedType.role}. 이 화면은 원본 Python의 시약 반응
-                  오버라이딩을 실험 흐름으로 재현합니다.
+                  {selectedType.role}. 시약 반응 오버라이딩 결과를 실험
+                  흐름으로 보여줍니다.
                 </p>
               </div>
               <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">

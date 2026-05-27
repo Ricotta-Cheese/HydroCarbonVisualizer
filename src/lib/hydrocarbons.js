@@ -25,7 +25,7 @@ export const reagentMetadata = {
     finalLabel: "흰색 침전 또는 변화 없음",
     initialColor: "#e2e8f0",
     accentColor: "#94a3b8",
-    detects: "원본 코드 기준 알카인 계열 반응",
+    detects: "알카인 계열의 침전 반응",
     observation: "흰색 침전물이 생기는지 관찰합니다.",
   },
 };
@@ -109,6 +109,7 @@ const reagentVisuals = {
       phase: "unchanged",
       tone: "neutral",
       status: "No reaction",
+      labComment: "적갈색 유지",
       observation: "포화 탄화수소라 브롬수의 적갈색이 유지됩니다.",
     },
     "과망가니즈산 칼륨": {
@@ -117,6 +118,7 @@ const reagentVisuals = {
       phase: "unchanged",
       tone: "neutral",
       status: "No reaction",
+      labComment: "보라색 유지",
       observation: "단일 결합만 있어 보라색 용액이 유지됩니다.",
     },
     "암모니아성 질산은": {
@@ -125,6 +127,7 @@ const reagentVisuals = {
       phase: "unchanged",
       tone: "neutral",
       status: "No visible change",
+      labComment: "침전 없음",
       observation: "침전 없이 용액이 투명하게 남습니다.",
     },
   },
@@ -135,6 +138,7 @@ const reagentVisuals = {
       phase: "decolorized",
       tone: "reactive",
       status: "Positive unsaturation test",
+      labComment: "무색으로 탈색",
       observation: "이중 결합이 반응해 적갈색이 무색으로 탈색됩니다.",
     },
     "과망가니즈산 칼륨": {
@@ -143,6 +147,7 @@ const reagentVisuals = {
       phase: "precipitate",
       tone: "reactive",
       status: "Positive oxidation test",
+      labComment: "갈색 침전 생성",
       observation: "보라색이 사라지고 갈색 침전이 나타납니다.",
     },
     "암모니아성 질산은": {
@@ -151,7 +156,8 @@ const reagentVisuals = {
       phase: "unchanged",
       tone: "neutral",
       status: "No reaction",
-      observation: "원본 코드 기준으로 침전 없이 반응하지 않습니다.",
+      labComment: "침전 없음",
+      observation: "침전 없이 변화가 거의 나타나지 않습니다.",
     },
   },
   alkyne: {
@@ -161,6 +167,7 @@ const reagentVisuals = {
       phase: "changed",
       tone: "reactive",
       status: "Fast color change",
+      labComment: "옅은 노란색으로 변화",
       observation: "삼중 결합 때문에 브롬수 색이 빠르게 옅어집니다.",
     },
     "과망가니즈산 칼륨": {
@@ -169,6 +176,7 @@ const reagentVisuals = {
       phase: "changed",
       tone: "reactive",
       status: "Fast color change",
+      labComment: "갈색으로 변화",
       observation: "삼중 결합이 빠르게 반응해 용액 색이 변합니다.",
     },
     "암모니아성 질산은": {
@@ -177,8 +185,8 @@ const reagentVisuals = {
       phase: "white-precipitate",
       tone: "reactive",
       status: "White precipitate",
-      observation:
-        "원본 Python 로직에 맞춰 알카인 선택 시 흰색 침전 생성을 표시합니다.",
+      labComment: "흰색 침전 생성",
+      observation: "알카인 선택 시 흰색 침전이 생성됩니다.",
     },
   },
 };
@@ -268,6 +276,7 @@ export function getReagentTestResult(typeKey, reagent, carbonCount) {
     phase: "unknown",
     tone: "neutral",
     status: "Unknown",
+    labComment: "관찰 결과 없음",
     observation: "반응 데이터가 없습니다.",
   };
   const details = getHydrocarbonDetails(type, carbonCount);

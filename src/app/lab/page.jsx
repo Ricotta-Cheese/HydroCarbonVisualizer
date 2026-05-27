@@ -5,8 +5,6 @@ import AppNavigation from "@/components/AppNavigation";
 import {
   formatNumber,
   getCarbonOptions,
-  getClassFlow,
-  getCombustionReaction,
   getHydrocarbonDetails,
   getHydrocarbonName,
   getReagentTestResult,
@@ -38,26 +36,39 @@ function FormulaRule({ rule }) {
   );
 }
 
-function ClassFlow({ flow }) {
+function CombustionEquation({ details, type }) {
   return (
-    <div className="class-flow class-flow-light">
-      {flow.map((className, index) => (
-        <span className="class-flow-step" key={className}>
-          <code>{className}</code>
-          {index < flow.length - 1 ? (
-            <span className="class-flow-arrow" aria-hidden="true">
-              →
-            </span>
-          ) : null}
-        </span>
-      ))}
-    </div>
+    <span className="equation">
+      {type.reactionPrefix}{" "}
+      <ChemicalFormula carbon={details.carbon} hydrogen={details.hCount} /> +{" "}
+      {formatNumber(details.oxygen)} O<sub>2</sub> -&gt; {details.carbon} CO
+      <sub>2</sub> + {formatNumber(details.water)} H<sub>2</sub>O
+    </span>
+  );
+}
+
+function getObservationSummary(reactionResult) {
+  const initial = reactionResult.metadata.initialLabel;
+  const final = reactionResult.finalLabel;
+
+  return `${initial} → ${final}`;
+}
+
+function ControlSection({ children, step, title }) {
+  return (
+    <section className="lab-control-section">
+      <div className="lab-control-heading">
+        <span className="lab-step-index">{step}</span>
+        <p className="lab-control-label">{title}</p>
+      </div>
+      {children}
+    </section>
   );
 }
 
 function TypeSelector({ selectedTypeKey, onSelect }) {
   return (
-    <div className="combustion-type-selector" role="tablist">
+    <div className="lab-type-selector" role="tablist" aria-label="탄화수소 종류">
       {typeKeys.map((typeKey) => {
         const type = hydrocarbonTypes[typeKey];
         const isActive = selectedTypeKey === typeKey;
@@ -69,17 +80,15 @@ function TypeSelector({ selectedTypeKey, onSelect }) {
             role="tab"
             aria-selected={isActive}
             onClick={() => onSelect(typeKey)}
-            className={`combustion-type-card combustion-type-card-${type.accent} ${
-              isActive ? "combustion-type-card-active" : ""
+            className={`lab-type-card lab-type-card-${type.accent} ${
+              isActive ? "lab-type-card-active" : ""
             }`}
           >
-            <span className="combustion-type-orb" />
-            <span className="block text-[0.68rem] font-semibold text-slate-500">
-              {type.koreanName}
+            <span className="lab-type-rule">
+              <FormulaRule rule={type.formulaRule} />
             </span>
-            <strong className="mt-0.5 block text-base font-semibold text-slate-950">
-              {type.className}
-            </strong>
+            <span className="lab-type-name">{type.koreanName}</span>
+            <strong>{type.className}</strong>
           </button>
         );
       })}
@@ -87,9 +96,78 @@ function TypeSelector({ selectedTypeKey, onSelect }) {
   );
 }
 
+function CarbonControl({
+  carbonCount,
+  carbonOptions,
+  carbonRangeProgress,
+  onChange,
+  selectedType,
+}) {
+  return (
+    <>
+      <div className="lab-carbon-readout">
+        <div>
+          <span>탄소 수</span>
+          <strong>{carbonCount}</strong>
+        </div>
+        <em>
+          <FormulaRule rule={selectedType.formulaRule} />
+        </em>
+      </div>
+
+      <div className="combustion-carbon-stepper">
+        <button
+          type="button"
+          onClick={() => onChange(carbonCount - 1)}
+          disabled={carbonCount <= selectedType.minCarbon}
+          aria-label="Decrease carbon count"
+          className="combustion-carbon-button"
+        >
+          -
+        </button>
+        <input
+          type="range"
+          min={selectedType.minCarbon}
+          max={selectedType.maxCarbon}
+          value={carbonCount}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="combustion-range"
+          style={{ "--range-progress": `${carbonRangeProgress}%` }}
+          aria-label="Carbon count"
+        />
+        <button
+          type="button"
+          onClick={() => onChange(carbonCount + 1)}
+          disabled={carbonCount >= selectedType.maxCarbon}
+          aria-label="Increase carbon count"
+          className="combustion-carbon-button"
+        >
+          +
+        </button>
+      </div>
+
+      <div className="lab-carbon-pills" aria-label="빠른 탄소 수 선택">
+        {carbonOptions.map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => onChange(option)}
+            className={`lab-carbon-pill ${
+              option === carbonCount ? "lab-carbon-pill-active" : ""
+            }`}
+            aria-pressed={option === carbonCount}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
 function ReagentButtons({ selectedReagent, onSelect }) {
   return (
-    <div className="lab-reagent-grid" role="tablist" aria-label="Lab reagent">
+    <div className="lab-reagent-grid" role="tablist" aria-label="시약">
       {reagents.map((reagent) => {
         const metadata = reagentMetadata[reagent];
         const isActive = selectedReagent === reagent;
@@ -115,47 +193,42 @@ function ReagentButtons({ selectedReagent, onSelect }) {
   );
 }
 
-function LabSummaryMetric({ label, children }) {
-  return (
-    <div className="lab-summary-metric">
-      <span>{label}</span>
-      <strong>{children}</strong>
-    </div>
-  );
-}
+function ReactionPreview({ details, reactionResult }) {
+  const liquidKey = `${reactionResult.typeKey}-${reactionResult.reagent}-${details.carbon}`;
 
-function ReactionPreview({ details, reactionResult, selectedType }) {
   return (
     <div
-      className={`lab-preview lab-preview-${selectedType.accent} reagent-phase-${reactionResult.phase}`}
+      className={`lab-preview reagent-phase-${reactionResult.phase}`}
       style={{
         "--reagent-initial": reactionResult.metadata.initialColor,
         "--reagent-final": reactionResult.finalColor,
         "--reagent-accent": reactionResult.metadata.accentColor,
       }}
     >
-      <div className="lab-molecule-chip lab-molecule-chip-fuel">
-        <span>Hydrocarbon</span>
+      <div className="lab-preview-chip">
+        <span>분자</span>
         <strong>
           <ChemicalFormula carbon={details.carbon} hydrogen={details.hCount} />
         </strong>
       </div>
-      <div className="lab-preview-arrow" aria-hidden="true">
-        →
-      </div>
-      <div className="lab-mini-beaker" aria-label="Selected reagent result">
-        <div className="lab-mini-liquid">
-          <span />
-          <span />
-          <span />
+
+      <div
+        className="lab-mini-beaker"
+        aria-label={`${reactionResult.reagent} 관찰 결과: ${reactionResult.finalLabel}`}
+      >
+        <div className="lab-mini-liquid" key={liquidKey}>
+          <span className="lab-liquid-layer lab-liquid-layer-initial" />
+          <span className="lab-liquid-layer lab-liquid-layer-final" />
+          <span className="lab-liquid-shine" />
+          <span className="lab-precipitate-dot lab-precipitate-dot-1" />
+          <span className="lab-precipitate-dot lab-precipitate-dot-2" />
+          <span className="lab-precipitate-dot lab-precipitate-dot-3" />
         </div>
       </div>
-      <div className="lab-preview-arrow" aria-hidden="true">
-        →
-      </div>
-      <div className="lab-molecule-chip lab-molecule-chip-result">
-        <span>Observed</span>
-        <strong>{reactionResult.status}</strong>
+
+      <div className="lab-preview-chip lab-preview-chip-result">
+        <span>관찰</span>
+        <strong>{reactionResult.finalLabel}</strong>
       </div>
     </div>
   );
@@ -176,13 +249,14 @@ export default function LabPage() {
     () => getReagentTestResult(selectedTypeKey, selectedReagent, carbonCount),
     [selectedTypeKey, selectedReagent, carbonCount]
   );
-  const combustionReaction = getCombustionReaction(selectedType, carbonCount);
-  const classFlow = getClassFlow(selectedTypeKey);
   const moleculeName = getHydrocarbonName(selectedTypeKey, carbonCount);
+  const observationSummary = getObservationSummary(reactionResult);
   const carbonRangeProgress =
     ((carbonCount - selectedType.minCarbon) /
       Math.max(selectedType.maxCarbon - selectedType.minCarbon, 1)) *
     100;
+  const outcomeLabel =
+    reactionResult.tone === "reactive" ? "반응 관찰" : "변화 없음";
 
   function handleTypeSelect(typeKey) {
     const nextType = hydrocarbonTypes[typeKey];
@@ -202,197 +276,134 @@ export default function LabPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_40%,#eef2ff_100%)] text-slate-950">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_48%,#edf7f4_100%)] text-slate-950">
       <section className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 lg:px-10">
         <AppNavigation active="lab" />
 
-        <header className="border-b border-slate-200/80 pb-8 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-violet-700">
-            Reaction Lab
-          </p>
-          <h1 className="hero-title-one-line mx-auto mt-4">
-            One Object, Two Behaviors
-          </h1>
-          <p className="korean-keep mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">
-            탄화수소 객체 하나를 선택하면 공통 계산은 부모 클래스에서,
-            연소식과 시약 반응은 하위 클래스의 오버라이딩으로 완성됩니다.
-          </p>
+        <header className="lab-hero">
+          <div>
+            <p className="lab-eyebrow">Reaction Lab</p>
+            <h1 className="mt-3 text-4xl font-semibold leading-tight text-slate-950 sm:text-5xl">
+              반응 조합 실험실
+            </h1>
+            <p className="korean-keep mt-4 max-w-2xl text-base leading-7 text-slate-600">
+              탄화수소 종류, 탄소 수, 시약을 조합해 분자 계산과 반응 결과를
+              한 화면에서 비교합니다.
+            </p>
+          </div>
+
+          <div className="lab-current-chip" aria-label="현재 선택">
+            <span>현재 조합</span>
+            <strong>
+              {selectedType.className} ·{" "}
+              <ChemicalFormula carbon={details.carbon} hydrogen={details.hCount} />
+            </strong>
+            <small>{selectedReagent}</small>
+          </div>
         </header>
 
-        <div className="grid gap-6 py-8 lg:grid-cols-[390px_minmax(0,1fr)] lg:items-start">
-          <aside className="lab-control-stack">
-            <section className="lab-control-section">
-              <p className="reagent-panel-kicker">Class type</p>
+        <div className="grid gap-6 py-8 lg:grid-cols-[360px_minmax(0,1fr)] lg:items-start">
+          <aside className="lab-control-stack" aria-label="실험 조건">
+            <ControlSection step="1" title="탄화수소">
               <TypeSelector
                 selectedTypeKey={selectedTypeKey}
                 onSelect={handleTypeSelect}
               />
-            </section>
+            </ControlSection>
 
-            <section className="lab-control-section">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="reagent-panel-kicker">Carbon count</p>
-                  <strong className="mt-2 block text-4xl font-semibold leading-none tracking-normal">
-                    {carbonCount}
-                  </strong>
-                </div>
-                <span className="combustion-control-rule">
-                  <FormulaRule rule={selectedType.formulaRule} />
-                </span>
-              </div>
+            <ControlSection step="2" title="탄소 수">
+              <CarbonControl
+                carbonCount={carbonCount}
+                carbonOptions={carbonOptions}
+                carbonRangeProgress={carbonRangeProgress}
+                onChange={updateCarbonCount}
+                selectedType={selectedType}
+              />
+            </ControlSection>
 
-              <div className="combustion-carbon-stepper mt-5">
-                <button
-                  type="button"
-                  onClick={() => updateCarbonCount(carbonCount - 1)}
-                  disabled={carbonCount <= selectedType.minCarbon}
-                  aria-label="Decrease carbon count"
-                  className="combustion-carbon-button"
-                >
-                  -
-                </button>
-                <input
-                  type="range"
-                  min={selectedType.minCarbon}
-                  max={selectedType.maxCarbon}
-                  value={carbonCount}
-                  onChange={(event) => updateCarbonCount(Number(event.target.value))}
-                  className="combustion-range"
-                  style={{ "--range-progress": `${carbonRangeProgress}%` }}
-                />
-                <button
-                  type="button"
-                  onClick={() => updateCarbonCount(carbonCount + 1)}
-                  disabled={carbonCount >= selectedType.maxCarbon}
-                  aria-label="Increase carbon count"
-                  className="combustion-carbon-button"
-                >
-                  +
-                </button>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {carbonOptions.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => updateCarbonCount(option)}
-                    className={`lab-carbon-pill ${
-                      option === carbonCount ? "lab-carbon-pill-active" : ""
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="lab-control-section">
-              <p className="reagent-panel-kicker">Reagent</p>
+            <ControlSection step="3" title="시약">
               <ReagentButtons
                 selectedReagent={selectedReagent}
                 onSelect={setSelectedReagent}
               />
-            </section>
+            </ControlSection>
           </aside>
 
-          <section className="lab-output-surface">
-            <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 md:flex-row md:items-start md:justify-between">
-              <div>
-                <span
-                  className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold ${
-                    selectedType.accent === "amber"
-                      ? "bg-amber-100 text-amber-950"
-                      : selectedType.accent === "violet"
-                        ? "bg-violet-100 text-violet-950"
-                        : "bg-teal-100 text-teal-950"
-                  }`}
-                >
-                  {selectedType.className}
-                </span>
-                <h2 className="mt-4 text-5xl font-semibold tracking-normal text-slate-950 sm:text-6xl">
+          <section className="lab-output-surface" aria-live="polite">
+            <section
+              className={`lab-primary-result lab-primary-result-${selectedType.accent} reagent-phase-${reactionResult.phase}`}
+              style={{
+                "--reagent-initial": reactionResult.metadata.initialColor,
+                "--reagent-final": reactionResult.finalColor,
+                "--reagent-accent": reactionResult.metadata.accentColor,
+              }}
+            >
+              <div className="lab-primary-copy">
+                <div className="flex flex-wrap gap-2">
+                  <span
+                    className={`lab-type-badge lab-type-badge-${selectedType.accent}`}
+                  >
+                    {selectedType.className}
+                  </span>
+                  <span
+                    className={`lab-outcome-badge lab-outcome-badge-${reactionResult.tone}`}
+                  >
+                    {outcomeLabel}
+                  </span>
+                </div>
+
+                <h2 className="mt-5 text-4xl font-semibold leading-tight text-slate-950 sm:text-5xl">
                   <ChemicalFormula
                     carbon={details.carbon}
                     hydrogen={details.hCount}
                   />
                 </h2>
-                <p className="korean-keep mt-3 text-base leading-7 text-slate-600">
-                  {moleculeName}은 {selectedType.role}입니다.
+                <p className="korean-keep mt-2 text-base font-semibold text-slate-600">
+                  {moleculeName} + {selectedReagent}
+                </p>
+                <p className="korean-keep mt-6 text-2xl font-semibold leading-snug text-slate-950">
+                  {observationSummary}
+                </p>
+                <p className="lab-comment korean-keep">
+                  {reactionResult.labComment}
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-                  Selected reagent
-                </p>
-                <p className="korean-keep mt-2 text-base font-semibold">
-                  {selectedReagent}
-                </p>
-              </div>
-            </div>
 
-            <div className="mt-6">
-              <ReactionPreview
-                details={details}
-                reactionResult={reactionResult}
-                selectedType={selectedType}
-              />
-            </div>
-
-            <section className="lab-summary-grid mt-6">
-              <LabSummaryMetric label="Molecule">
-                {moleculeName}
-              </LabSummaryMetric>
-              <LabSummaryMetric label="Molar mass">
-                {details.molarMass} g/mol
-              </LabSummaryMetric>
-              <LabSummaryMetric label="Oxygen">
-                {formatNumber(details.oxygen)} O<sub>2</sub>
-              </LabSummaryMetric>
-              <LabSummaryMetric label="Products">
-                {details.carbon} CO<sub>2</sub> + {formatNumber(details.water)} H
-                <sub>2</sub>O
-              </LabSummaryMetric>
+              <ReactionPreview details={details} reactionResult={reactionResult} />
             </section>
 
-            <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <section className="lab-result-card lab-result-card-dark">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-300">
-                  get_combustion_reaction()
-                </p>
-                <p className="mt-4 font-mono text-sm leading-7 text-white sm:text-base">
-                  {combustionReaction}
-                </p>
-              </section>
-
-              <section className="lab-result-card">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-                  perform_test(reagent)
-                </p>
-                <code className="mt-4 block rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white">
-                  {reactionResult.methodCall}
-                </code>
-                <p className="korean-keep mt-4 text-2xl font-semibold leading-snug text-slate-950">
-                  {reactionResult.result}
-                </p>
-                <p className="korean-keep mt-3 text-sm leading-6 text-slate-600">
-                  {reactionResult.observation}
-                </p>
-              </section>
-            </div>
-
-            <section className="lab-result-card mt-4">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
-                    Selected class flow
-                  </p>
-                  <ClassFlow flow={classFlow} />
-                </div>
-                <p className="korean-keep max-w-xl text-sm leading-6 text-slate-600">
-                  부모 클래스의 공통 계산을 상속하고, 하위 클래스가 반응
-                  메서드를 재정의해 다형성을 보여줍니다.
-                </p>
+            <section className="lab-compact-summary mt-4">
+              <div className="lab-compact-summary-heading">
+                <span>계산 요약</span>
+                <strong>{moleculeName}</strong>
               </div>
+
+              <div className="lab-compact-metrics">
+                <div>
+                  <span>분자량</span>
+                  <strong>{details.molarMass} g/mol</strong>
+                </div>
+                <div>
+                  <span>필요 산소</span>
+                  <strong>
+                    {formatNumber(details.oxygen)} O<sub>2</sub>
+                  </strong>
+                </div>
+                <div>
+                  <span>생성물</span>
+                  <strong>
+                    {details.carbon} CO<sub>2</sub> +{" "}
+                    {formatNumber(details.water)} H<sub>2</sub>O
+                  </strong>
+                </div>
+              </div>
+
+              <details className="lab-equation-details">
+                <summary>연소식 보기</summary>
+                <p>
+                  <CombustionEquation details={details} type={selectedType} />
+                </p>
+              </details>
             </section>
           </section>
         </div>
