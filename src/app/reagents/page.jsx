@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AppNavigation from "@/components/AppNavigation";
 import {
   getClassFlow,
@@ -50,19 +50,66 @@ function ClassFlow({ flow }) {
   );
 }
 
-function ReagentBeaker({ result }) {
+const reactionStageLabels = {
+  idle: "Before test",
+  dropping: "Reagent drop",
+  reacting: "Color shift",
+  complete: "Observed",
+};
+
+const reactionPanelCopy = {
+  idle: {
+    status: "Ready for reagent",
+    result: "관찰 전",
+    observation: "용액은 아직 시약의 초기 색을 유지합니다.",
+  },
+  dropping: {
+    status: "Adding reagent",
+    result: "시약 투입 중",
+    observation: "스포이드 끝에서 시약 방울이 떨어지고 있습니다.",
+  },
+  reacting: {
+    status: "Running dispatch",
+    result: "perform_test(reagent) 실행 중",
+    observation: "용액 색이 선택된 class의 반응 결과로 전환되는 중입니다.",
+  },
+};
+
+function ReagentBeaker({ result, reactionStage, reactionRun, onStartReaction }) {
   const clipId = `beaker-liquid-${result.typeKey}-${result.reagent.replace(/\s/g, "-")}`;
+  const isReactionBusy =
+    reactionStage === "dropping" || reactionStage === "reacting";
+  const displayedResultLabel =
+    reactionStage === "idle"
+      ? (result.initialLabel ?? result.metadata.initialLabel)
+      : reactionStage === "complete"
+        ? (result.finalLabel ?? result.metadata.finalLabel)
+        : "반응 중";
 
   return (
     <div
-      key={`${result.typeKey}-${result.reagent}`}
-      className={`reagent-stage reagent-stage-${result.type.accent} reagent-phase-${result.phase}`}
+      key={`${result.typeKey}-${result.reagent}-${reactionRun}`}
+      className={`reagent-stage reagent-stage-${result.type.accent} reagent-stage-${reactionStage} reagent-phase-${result.phase}`}
       style={{
         "--reagent-initial": result.metadata.initialColor,
         "--reagent-final": result.finalColor,
         "--reagent-accent": result.metadata.accentColor,
       }}
     >
+      {reactionStage === "idle" ? (
+        <div className="reagent-dropper-hint" aria-hidden="true">
+          스포이드를 클릭해보세요!
+        </div>
+      ) : null}
+      <button
+        type="button"
+        className="reagent-dropper-trigger"
+        onClick={onStartReaction}
+        disabled={isReactionBusy}
+        aria-label={`${result.reagent} 시약 스포이드를 눌러 떨어뜨리기`}
+      >
+        <span className="reagent-dropper-ring" aria-hidden="true" />
+      </button>
       <svg
         className="beaker-visual"
         viewBox="0 0 360 360"
@@ -78,13 +125,25 @@ function ReagentBeaker({ result }) {
             <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.28" />
             <stop offset="1" stopColor="#cbd5e1" stopOpacity="0.2" />
           </linearGradient>
+          <linearGradient
+            id={`${clipId}-liquid-shift`}
+            x1="180"
+            y1="188"
+            x2="180"
+            y2="318"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stopColor="var(--reagent-final)" stopOpacity="1" />
+            <stop offset="0.48" stopColor="var(--reagent-final)" stopOpacity="1" />
+            <stop offset="1" stopColor="var(--reagent-final)" stopOpacity="1" />
+          </linearGradient>
         </defs>
 
         <g className="beaker-svg-dropper" aria-hidden="true">
-          <rect x="160" y="24" width="54" height="126" rx="27" />
-          <path d="M163 144 L215 134 L219 156 L168 166 Z" />
-          <rect x="187" y="158" width="16" height="38" rx="8" />
-          <circle className="beaker-svg-drop" cx="197" cy="216" r="5.5" />
+          <rect x="153" y="-8" width="54" height="126" rx="27" />
+          <path d="M154 112 H206 L212 134 H148 Z" />
+          <rect x="172" y="126" width="16" height="38" rx="8" />
+          <circle className="beaker-svg-drop" cx="180" cy="184" r="5.5" />
         </g>
 
         <g className="beaker-svg-vessel">
@@ -96,7 +155,13 @@ function ReagentBeaker({ result }) {
             className="beaker-svg-liquid"
             d="M88 188 C126 199 234 199 272 188 L272 282 C272 304 254 318 232 318 L128 318 C106 318 88 304 88 282 Z"
           />
+          <path
+            className="beaker-svg-liquid-final"
+            d="M88 188 C126 199 234 199 272 188 L272 282 C272 304 254 318 232 318 L128 318 C106 318 88 304 88 282 Z"
+            fill={`url(#${clipId}-liquid-shift)`}
+          />
           <ellipse className="beaker-svg-liquid-rim" cx="180" cy="188" rx="92" ry="10" />
+          <ellipse className="beaker-svg-liquid-rim-final" cx="180" cy="188" rx="92" ry="10" />
           <g clipPath={`url(#${clipId})`}>
             <ellipse className="beaker-svg-liquid-shine" cx="180" cy="189" rx="88" ry="7" />
             <circle className="beaker-svg-precipitate beaker-svg-precipitate-1" cx="136" cy="300" r="6" />
@@ -121,8 +186,8 @@ function ReagentBeaker({ result }) {
         </g>
       </svg>
       <div className="reagent-stage-caption">
-        <span>{result.initialLabel ?? result.metadata.initialLabel}</span>
-        <strong>{result.finalLabel ?? result.metadata.finalLabel}</strong>
+        <span>{reactionStageLabels[reactionStage]}</span>
+        <strong>{displayedResultLabel}</strong>
       </div>
     </div>
   );
@@ -192,12 +257,67 @@ function ReagentSelector({ selectedReagent, onSelect }) {
 export default function ReagentsPage() {
   const [selectedTypeKey, setSelectedTypeKey] = useState("alkene");
   const [selectedReagent, setSelectedReagent] = useState("브롬수");
+  const [reactionStage, setReactionStage] = useState("idle");
+  const [reactionRun, setReactionRun] = useState(0);
   const result = useMemo(
     () => getReagentTestResult(selectedTypeKey, selectedReagent),
     [selectedTypeKey, selectedReagent]
   );
   const selectedType = hydrocarbonTypes[selectedTypeKey];
   const classFlow = getClassFlow(selectedTypeKey);
+  const panelCopy = reactionPanelCopy[reactionStage] ?? {
+    status: result.status,
+    result: result.result,
+    observation: result.observation,
+  };
+  const resetReaction = () => {
+    setReactionStage("idle");
+    setReactionRun(0);
+  };
+  const handleTypeSelect = (typeKey) => {
+    setSelectedTypeKey(typeKey);
+    resetReaction();
+  };
+  const handleReagentSelect = (reagent) => {
+    setSelectedReagent(reagent);
+    resetReaction();
+  };
+  const handleStartReaction = () => {
+    if (reactionStage === "dropping" || reactionStage === "reacting") {
+      return;
+    }
+
+    setReactionRun((currentRun) => currentRun + 1);
+    setReactionStage("dropping");
+  };
+
+  useEffect(() => {
+    if (reactionStage !== "dropping") {
+      return undefined;
+    }
+
+    const reactingTimer = window.setTimeout(() => {
+      setReactionStage("reacting");
+    }, 820);
+
+    return () => {
+      window.clearTimeout(reactingTimer);
+    };
+  }, [reactionStage, reactionRun]);
+
+  useEffect(() => {
+    if (reactionStage !== "reacting") {
+      return undefined;
+    }
+
+    const completeTimer = window.setTimeout(() => {
+      setReactionStage("complete");
+    }, 1680);
+
+    return () => {
+      window.clearTimeout(completeTimer);
+    };
+  }, [reactionStage, reactionRun]);
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_44%,#f1f5f9_100%)] text-slate-950">
@@ -259,7 +379,7 @@ export default function ReagentsPage() {
                   <p className="reagent-panel-kicker">Hydrocarbon class</p>
                   <TypeSelector
                     selectedTypeKey={selectedTypeKey}
-                    onSelect={setSelectedTypeKey}
+                    onSelect={handleTypeSelect}
                   />
                 </div>
 
@@ -267,12 +387,17 @@ export default function ReagentsPage() {
                   <p className="reagent-panel-kicker">Reagent</p>
                   <ReagentSelector
                     selectedReagent={selectedReagent}
-                    onSelect={setSelectedReagent}
+                    onSelect={handleReagentSelect}
                   />
                 </div>
               </div>
 
-              <ReagentBeaker result={result} />
+              <ReagentBeaker
+                result={result}
+                reactionStage={reactionStage}
+                reactionRun={reactionRun}
+                onStartReaction={handleStartReaction}
+              />
             </div>
           </section>
 
@@ -282,7 +407,7 @@ export default function ReagentsPage() {
                 Method dispatch
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-normal text-white">
-                {result.status}
+                {panelCopy.status}
               </h2>
             </div>
 
@@ -300,10 +425,10 @@ export default function ReagentsPage() {
                 Execution result
               </p>
               <p className="korean-keep mt-3 text-2xl font-semibold leading-snug text-white">
-                {result.result}
+                {panelCopy.result}
               </p>
               <p className="korean-keep mt-3 text-sm leading-6 text-slate-300">
-                {result.observation}
+                {panelCopy.observation}
               </p>
             </div>
 

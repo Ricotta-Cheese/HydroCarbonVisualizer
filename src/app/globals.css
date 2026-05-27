@@ -1557,9 +1557,10 @@ textarea {
 
 .beaker-svg-dropper {
   filter: drop-shadow(0 12px 20px rgba(15, 23, 42, 0.16));
-  transform: rotate(-8deg);
+  transform: translateY(0);
   transform-box: fill-box;
-  transform-origin: center;
+  transform-origin: center top;
+  transition: filter 180ms ease;
 }
 
 .beaker-svg-dropper rect {
@@ -1576,8 +1577,10 @@ textarea {
 }
 
 .beaker-svg-drop {
-  animation: reagent-svg-drop 1400ms ease-in-out infinite;
   filter: drop-shadow(0 0 8px color-mix(in srgb, var(--reagent-initial) 50%, transparent));
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 .beaker-svg-glass-fill {
@@ -1586,13 +1589,33 @@ textarea {
 }
 
 .beaker-svg-liquid {
-  fill: var(--reagent-final);
+  fill: var(--reagent-initial);
   filter: saturate(1.04);
 }
 
+.beaker-svg-liquid-final {
+  filter: saturate(1.04);
+  opacity: 0;
+  transform: translateY(-18px) scaleY(0.08);
+  transform-box: fill-box;
+  transform-origin: center top;
+  transition:
+    opacity 280ms ease,
+    stroke 360ms ease;
+}
+
 .beaker-svg-liquid-rim {
-  fill: var(--reagent-final);
+  fill: var(--reagent-initial);
   opacity: 0.32;
+  transition: opacity 1100ms ease;
+}
+
+.beaker-svg-liquid-rim-final {
+  fill: var(--reagent-final);
+  opacity: 0;
+  transform: scaleX(0.72);
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 .beaker-svg-liquid-shine {
@@ -1655,10 +1678,13 @@ textarea {
   transform-origin: center;
 }
 
-.reagent-phase-precipitate .beaker-svg-precipitate,
-.reagent-phase-white-precipitate .beaker-svg-precipitate,
-.reagent-phase-changed .beaker-svg-precipitate {
-  animation: reagent-svg-precipitate 760ms ease 560ms both;
+.reagent-stage-reacting.reagent-phase-precipitate .beaker-svg-precipitate,
+.reagent-stage-complete.reagent-phase-precipitate .beaker-svg-precipitate,
+.reagent-stage-reacting.reagent-phase-white-precipitate .beaker-svg-precipitate,
+.reagent-stage-complete.reagent-phase-white-precipitate .beaker-svg-precipitate,
+.reagent-stage-reacting.reagent-phase-changed .beaker-svg-precipitate,
+.reagent-stage-complete.reagent-phase-changed .beaker-svg-precipitate {
+  animation: reagent-svg-precipitate 760ms ease 460ms both;
 }
 
 .reagent-phase-white-precipitate .beaker-svg-precipitate {
@@ -1666,12 +1692,14 @@ textarea {
   filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9));
 }
 
-.reagent-phase-decolorized .beaker-svg-liquid {
+.reagent-stage-reacting.reagent-phase-decolorized .beaker-svg-liquid-final,
+.reagent-stage-complete.reagent-phase-decolorized .beaker-svg-liquid-final {
   stroke: rgba(148, 163, 184, 0.2);
   stroke-width: 1.5;
 }
 
-.reagent-phase-decolorized .beaker-svg-liquid-rim {
+.reagent-stage-reacting.reagent-phase-decolorized .beaker-svg-liquid-rim-final,
+.reagent-stage-complete.reagent-phase-decolorized .beaker-svg-liquid-rim-final {
   fill: rgba(148, 163, 184, 0.24);
 }
 
@@ -1693,6 +1721,136 @@ textarea {
     linear-gradient(135deg, #ffffff, #f8fafc 56%, color-mix(in srgb, var(--reagent-accent) 9%, #ffffff));
   background-size: 3.6rem 3.6rem, 3.6rem 3.6rem, auto;
   padding: 2rem;
+}
+
+.reagent-stage-dropping .beaker-svg-dropper {
+  animation: reagent-svg-dropper-press 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  filter: drop-shadow(0 16px 24px rgba(15, 23, 42, 0.2));
+}
+
+.reagent-stage-dropping .beaker-svg-drop {
+  animation: reagent-svg-drop 880ms ease-in both;
+}
+
+.reagent-stage-reacting .beaker-svg-liquid-final {
+  animation: reagent-svg-liquid-wash 1560ms cubic-bezier(0.2, 0.78, 0.2, 1) 80ms both;
+}
+
+.reagent-stage-complete .beaker-svg-liquid-final {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+}
+
+.reagent-stage-reacting .beaker-svg-liquid-rim-final {
+  animation: reagent-svg-rim-shift 1280ms ease 260ms both;
+}
+
+.reagent-stage-reacting .beaker-svg-liquid-rim,
+.reagent-stage-complete .beaker-svg-liquid-rim {
+  opacity: 0;
+}
+
+.reagent-stage-complete .beaker-svg-liquid-rim-final {
+  opacity: 0.34;
+  transform: scaleX(1);
+}
+
+.reagent-stage-dropping .beaker-svg-liquid-final,
+.reagent-stage-dropping .beaker-svg-liquid-rim-final {
+  transition-duration: 180ms;
+}
+
+.reagent-dropper-hint {
+  position: absolute;
+  top: 0.72rem;
+  left: 50%;
+  z-index: 9;
+  max-width: calc(100% - 2rem);
+  border: 1px solid color-mix(in srgb, var(--reagent-accent) 36%, #ffffff);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.12),
+    0 0 24px color-mix(in srgb, var(--reagent-accent) 16%, transparent);
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  padding: 0.58rem 0.78rem;
+  pointer-events: none;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  animation: reagent-dropper-hint-float 1800ms ease-in-out infinite;
+}
+
+.reagent-dropper-hint::after {
+  position: absolute;
+  bottom: -0.32rem;
+  left: 50%;
+  width: 0.62rem;
+  height: 0.62rem;
+  border-right: 1px solid color-mix(in srgb, var(--reagent-accent) 30%, #ffffff);
+  border-bottom: 1px solid color-mix(in srgb, var(--reagent-accent) 30%, #ffffff);
+  background: rgba(255, 255, 255, 0.94);
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.reagent-dropper-trigger {
+  position: absolute;
+  top: clamp(1.72rem, 7%, 2.78rem);
+  left: 50%;
+  z-index: 8;
+  width: 5.9rem;
+  height: 12.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transform: translateX(-50%);
+}
+
+.reagent-dropper-trigger:disabled {
+  cursor: default;
+}
+
+.reagent-dropper-trigger:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--reagent-accent) 72%, #ffffff);
+  outline-offset: 0.25rem;
+}
+
+.reagent-dropper-ring {
+  position: absolute;
+  inset: 0.4rem 0.55rem 0.7rem;
+  border: 2px solid color-mix(in srgb, var(--reagent-accent) 74%, #ffffff);
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 0.44rem color-mix(in srgb, var(--reagent-accent) 13%, transparent),
+    0 0 22px color-mix(in srgb, var(--reagent-accent) 24%, transparent);
+  opacity: 0.8;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.reagent-stage-idle .reagent-dropper-ring,
+.reagent-stage-complete .reagent-dropper-ring {
+  animation: reagent-dropper-invite 1550ms ease-in-out infinite;
+}
+
+.reagent-dropper-trigger:hover .reagent-dropper-ring,
+.reagent-dropper-trigger:focus-visible .reagent-dropper-ring {
+  border-color: color-mix(in srgb, var(--reagent-accent) 88%, #0f172a);
+  box-shadow:
+    0 0 0 0.36rem color-mix(in srgb, var(--reagent-accent) 18%, transparent),
+    0 0 28px color-mix(in srgb, var(--reagent-accent) 32%, transparent);
+}
+
+.reagent-stage-dropping .reagent-dropper-ring,
+.reagent-stage-reacting .reagent-dropper-ring {
+  animation: none;
+  opacity: 0;
+  transform: scale(1);
 }
 
 .reagent-dropper {
@@ -2278,6 +2436,81 @@ textarea {
   100% {
     opacity: 0;
     transform: translateY(34px) scale(1);
+  }
+}
+
+@keyframes reagent-svg-dropper-press {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  42% {
+    transform: translateY(9px) scale(0.985);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reagent-svg-liquid-wash {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) scaleY(0.08);
+  }
+
+  34% {
+    opacity: 0.62;
+  }
+
+  68% {
+    opacity: 0.88;
+    transform: translateY(-4px) scaleY(0.74);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes reagent-svg-rim-shift {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.72);
+  }
+
+  100% {
+    opacity: 0.34;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes reagent-dropper-invite {
+  0%,
+  100% {
+    opacity: 0.78;
+    transform: scale(1);
+  }
+
+  45% {
+    opacity: 1;
+    transform: scale(0.88);
+  }
+
+  68% {
+    transform: scale(0.94);
+  }
+}
+
+@keyframes reagent-dropper-hint-float {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+
+  50% {
+    transform: translate(-50%, -4px);
   }
 }
 
