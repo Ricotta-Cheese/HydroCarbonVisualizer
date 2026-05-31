@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import AppNavigation from "@/components/AppNavigation";
+import { ChemicalFormula, FormulaRule } from "@/components/ChemicalText";
 import {
   formatNumber,
   getHydrocarbonDetails,
@@ -9,32 +10,15 @@ import {
   hydrocarbonTypes,
   typeKeys,
 } from "@/lib/hydrocarbons";
+import {
+  focusRadioByOffset,
+  getNextRadioOption,
+  getRadioNavigationDirection,
+} from "@/lib/radioNavigation";
 
 const DESKTOP_STEP_SCROLL_RATIO = 0.675;
 const DESKTOP_SCROLL_ACTIVATION_RATIO = 0.04;
 const DESKTOP_BUTTON_SETTLE_RATIO = 0.14;
-
-function ChemicalFormula({ carbon, hydrogen }) {
-  return (
-    <span className="formula">
-      C<sub>{carbon}</sub>H<sub>{hydrogen}</sub>
-    </span>
-  );
-}
-
-function FormulaRule({ rule }) {
-  const hydrogenRule = {
-    "CnH2n+2": "2n+2",
-    CnH2n: "2n",
-    "CnH2n-2": "2n-2",
-  }[rule];
-
-  return (
-    <span className="formula">
-      C<sub>n</sub>H<sub>{hydrogenRule}</sub>
-    </span>
-  );
-}
 
 function EquationTerm({ active, delay = 0, children }) {
   return (
@@ -850,6 +834,18 @@ export default function CombustionPage() {
     );
   }
 
+  function handleTypeKeyDown(event, typeKey) {
+    const direction = getRadioNavigationDirection(event.key);
+
+    if (direction === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    handleTypeSelect(getNextRadioOption(typeKeys, typeKey, direction));
+    focusRadioByOffset(event, direction);
+  }
+
   function handleCarbonSelect(event) {
     updateCarbonCount(Number(event.target.value));
   }
@@ -1010,7 +1006,11 @@ export default function CombustionPage() {
                 </span>
               </div>
 
-              <div className="combustion-type-selector" role="tablist">
+              <div
+                className="combustion-type-selector"
+                role="radiogroup"
+                aria-label="Hydrocarbon type"
+              >
                 {typeKeys.map((typeKey) => {
                   const type = hydrocarbonTypes[typeKey];
                   const isActive = typeKey === selectedTypeKey;
@@ -1019,9 +1019,11 @@ export default function CombustionPage() {
                     <button
                       key={typeKey}
                       type="button"
-                      role="tab"
-                      aria-selected={isActive}
+                      role="radio"
+                      aria-checked={isActive}
+                      tabIndex={isActive ? 0 : -1}
                       onClick={() => handleTypeSelect(typeKey)}
+                      onKeyDown={(event) => handleTypeKeyDown(event, typeKey)}
                       className={`combustion-type-card combustion-type-card-${type.accent} ${
                         isActive ? "combustion-type-card-active" : ""
                       }`}

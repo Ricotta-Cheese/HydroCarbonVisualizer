@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import AppNavigation from "@/components/AppNavigation";
+import { ChemicalFormula, FormulaRule } from "@/components/ChemicalText";
 import {
   getClassFlow,
   getReagentTestResult,
@@ -10,28 +11,11 @@ import {
   reagents,
   typeKeys,
 } from "@/lib/hydrocarbons";
-
-function ChemicalFormula({ carbon, hydrogen }) {
-  return (
-    <span className="formula">
-      C<sub>{carbon}</sub>H<sub>{hydrogen}</sub>
-    </span>
-  );
-}
-
-function FormulaRule({ rule }) {
-  const hydrogenRule = {
-    "CnH2n+2": "2n+2",
-    CnH2n: "2n",
-    "CnH2n-2": "2n-2",
-  }[rule];
-
-  return (
-    <span className="formula">
-      C<sub>n</sub>H<sub>{hydrogenRule}</sub>
-    </span>
-  );
-}
+import {
+  focusRadioByOffset,
+  getNextRadioOption,
+  getRadioNavigationDirection,
+} from "@/lib/radioNavigation";
 
 function ClassFlow({ flow }) {
   return (
@@ -194,8 +178,24 @@ function ReagentBeaker({ result, reactionStage, reactionRun, onStartReaction }) 
 }
 
 function TypeSelector({ selectedTypeKey, onSelect }) {
+  function handleKeyDown(event, typeKey) {
+    const direction = getRadioNavigationDirection(event.key);
+
+    if (direction === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    onSelect(getNextRadioOption(typeKeys, typeKey, direction));
+    focusRadioByOffset(event, direction);
+  }
+
   return (
-    <div className="combustion-type-selector" role="tablist">
+    <div
+      className="combustion-type-selector"
+      role="radiogroup"
+      aria-label="Hydrocarbon type"
+    >
       {typeKeys.map((typeKey) => {
         const type = hydrocarbonTypes[typeKey];
         const isActive = selectedTypeKey === typeKey;
@@ -204,9 +204,11 @@ function TypeSelector({ selectedTypeKey, onSelect }) {
           <button
             key={typeKey}
             type="button"
-            role="tab"
-            aria-selected={isActive}
+            role="radio"
+            aria-checked={isActive}
+            tabIndex={isActive ? 0 : -1}
             onClick={() => onSelect(typeKey)}
+            onKeyDown={(event) => handleKeyDown(event, typeKey)}
             className={`combustion-type-card combustion-type-card-${type.accent} ${
               isActive ? "combustion-type-card-active" : ""
             }`}
@@ -226,8 +228,24 @@ function TypeSelector({ selectedTypeKey, onSelect }) {
 }
 
 function ReagentSelector({ selectedReagent, onSelect }) {
+  function handleKeyDown(event, reagent) {
+    const direction = getRadioNavigationDirection(event.key);
+
+    if (direction === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    onSelect(getNextRadioOption(reagents, reagent, direction));
+    focusRadioByOffset(event, direction);
+  }
+
   return (
-    <div className="reagent-selector" role="tablist" aria-label="Reagent selector">
+    <div
+      className="reagent-selector"
+      role="radiogroup"
+      aria-label="Reagent selector"
+    >
       {reagents.map((reagent) => {
         const metadata = reagentMetadata[reagent];
         const isActive = selectedReagent === reagent;
@@ -236,9 +254,11 @@ function ReagentSelector({ selectedReagent, onSelect }) {
           <button
             key={reagent}
             type="button"
-            role="tab"
-            aria-selected={isActive}
+            role="radio"
+            aria-checked={isActive}
+            tabIndex={isActive ? 0 : -1}
             onClick={() => onSelect(reagent)}
+            onKeyDown={(event) => handleKeyDown(event, reagent)}
             className={`reagent-tab ${isActive ? "reagent-tab-active" : ""}`}
             style={{ "--reagent-accent": metadata.accentColor }}
           >

@@ -42,7 +42,7 @@ textarea {
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.02;
-  white-space: nowrap;
+  text-wrap: balance;
 }
 
 @media (max-width: 639px) {
@@ -399,16 +399,6 @@ textarea {
   --stage-accent: #7c3aed;
 }
 
-.combustion-stage-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  min-height: 18rem;
-  grid-template-columns: minmax(0, 1.18fr) minmax(7rem, 0.7fr) minmax(0, 1fr);
-  gap: 1rem;
-  align-items: center;
-}
-
 .reaction-scene {
   position: relative;
   z-index: 1;
@@ -570,59 +560,6 @@ textarea {
 
 .reaction-burst-active {
   animation: reaction-burst 980ms ease-out both;
-}
-
-.reaction-zone {
-  position: relative;
-  display: flex;
-  min-height: 12rem;
-  overflow: hidden;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.72);
-  padding: 1rem;
-  backdrop-filter: blur(12px);
-  transition:
-    border-color 420ms ease,
-    box-shadow 420ms ease,
-    opacity 420ms ease,
-    transform 420ms ease;
-}
-
-.reaction-zone-active {
-  border-color: color-mix(in srgb, var(--stage-accent) 58%, #cbd5e1);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--stage-accent) 28%, transparent);
-}
-
-.reaction-zone-release {
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05);
-}
-
-.combustion-stage-step-1 .reaction-zone-fuel {
-  transform: translateX(0.25rem);
-}
-
-.combustion-stage-step-1 .reaction-zone-oxygen {
-  transform: translateX(-0.25rem);
-}
-
-.reaction-zone-consuming {
-  border-color: color-mix(in srgb, var(--stage-accent) 38%, #cbd5e1);
-  background:
-    radial-gradient(circle at 68% 48%, color-mix(in srgb, var(--stage-accent) 12%, transparent), transparent 38%),
-    rgba(255, 255, 255, 0.68);
-}
-
-.reaction-zone-producing {
-  border-color: color-mix(in srgb, var(--stage-accent) 58%, #cbd5e1);
-  background:
-    radial-gradient(circle at 32% 42%, color-mix(in srgb, var(--stage-accent) 12%, transparent), transparent 38%),
-    rgba(255, 255, 255, 0.78);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--stage-accent) 24%, transparent),
-    0 16px 34px rgba(15, 23, 42, 0.08);
 }
 
 .molecule-card {
@@ -990,250 +927,6 @@ textarea {
   stroke-width: 1.2;
 }
 
-.reaction-zone-label {
-  position: absolute;
-  top: 0.65rem;
-  left: 0.75rem;
-  z-index: 3;
-  color: #64748b;
-  font-size: 0.6rem;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.hydrocarbon-structure,
-.product-structure,
-.oxygen-molecule {
-  position: relative;
-}
-
-.hydrocarbon-structure {
-  display: flex;
-  height: 100%;
-  min-height: 10rem;
-  align-items: center;
-  justify-content: center;
-  transition:
-    opacity 420ms ease,
-    transform 520ms ease;
-}
-
-.hydrocarbon-structure-breaking {
-  opacity: 0.82;
-  transform: translateX(-0.25rem) scale(0.98);
-}
-
-.oxygen-molecule-grid,
-.product-molecule-grid {
-  display: grid;
-  height: 100%;
-  min-height: 9.5rem;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.oxygen-molecule-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding-top: 1rem;
-}
-
-.product-molecule-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding-top: 1.2rem;
-}
-
-.oxygen-molecule {
-  display: inline-flex;
-  min-height: 3.4rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  opacity: 0.32;
-  transform: translateX(-0.7rem) scale(0.92);
-  transition:
-    opacity 420ms ease,
-    transform 520ms ease;
-}
-
-.oxygen-molecule-active {
-  opacity: 1;
-  transform: translateX(0) scale(1);
-}
-
-.product-molecule {
-  display: grid;
-  min-height: 7.5rem;
-  align-items: center;
-  justify-items: center;
-  gap: 0.4rem;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.7);
-  opacity: 0.28;
-  padding: 0.65rem;
-  transform: translateX(-0.8rem) scale(0.95);
-  transition:
-    border-color 420ms ease,
-    opacity 420ms ease,
-    transform 520ms ease,
-    box-shadow 420ms ease;
-}
-
-.product-molecule-active {
-  border-color: color-mix(in srgb, var(--stage-accent) 56%, #cbd5e1);
-  opacity: 1;
-  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
-  transform: translateX(0) scale(1);
-}
-
-.product-structure {
-  display: inline-flex;
-  width: 100%;
-  min-height: 4.4rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-}
-
-.product-molecule strong {
-  color: #0f172a;
-  font-size: 0.95rem;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.chain-track {
-  display: flex;
-  max-width: 100%;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-}
-
-.chain-segment {
-  display: inline-flex;
-  align-items: center;
-}
-
-.chain-unit {
-  display: grid;
-  min-width: 3.35rem;
-  grid-template-rows: 1.35rem 2.4rem 1.35rem;
-  justify-items: center;
-  align-items: center;
-}
-
-.chain-middle,
-.chain-hydrogen-slot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.chain-hydrogen-slot {
-  min-height: 1.35rem;
-}
-
-.molecule-atom {
-  display: inline-flex;
-  position: relative;
-  z-index: 2;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  font-weight: 800;
-  line-height: 1;
-  animation: atom-arrive 520ms ease both;
-}
-
-.molecule-atom-carbon {
-  width: 2.35rem;
-  height: 2.35rem;
-  background: #0f172a;
-  color: #ffffff;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
-}
-
-.molecule-atom-carbon-small {
-  width: 1.8rem;
-  height: 1.8rem;
-  background: #0f172a;
-  color: #ffffff;
-  font-size: 0.75rem;
-}
-
-.molecule-atom-hydrogen {
-  width: 1.65rem;
-  height: 1.65rem;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  color: #475569;
-  font-size: 0.68rem;
-}
-
-.molecule-atom-oxygen {
-  width: 1.95rem;
-  height: 1.95rem;
-  border: 1px solid color-mix(in srgb, var(--stage-accent) 36%, #cbd5e1);
-  background: color-mix(in srgb, var(--stage-accent) 10%, #ffffff);
-  color: #0f172a;
-  font-size: 0.75rem;
-}
-
-.molecule-bond {
-  display: inline-flex;
-  position: relative;
-  z-index: 1;
-  flex: 0 0 auto;
-  width: 1.8rem;
-  height: 0.7rem;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.16rem;
-  opacity: 0.9;
-  transition:
-    opacity 320ms ease,
-    transform 320ms ease;
-}
-
-.molecule-bond span {
-  display: block;
-  width: 100%;
-  height: 2px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--stage-accent) 45%, #64748b);
-}
-
-.molecule-bond-vertical {
-  width: 0.7rem;
-  height: 0.85rem;
-  align-items: center;
-  flex-direction: row;
-  transform: none;
-}
-
-.molecule-bond-vertical span {
-  width: 2px;
-  height: 100%;
-}
-
-.chain-middle > .molecule-bond {
-  width: 0.85rem;
-}
-
-.chain-hydrogen-slot .molecule-bond {
-  width: 0.85rem;
-}
-
-.hydrocarbon-structure-breaking .chain-hydrogen-slot,
-.hydrocarbon-structure-breaking .chain-middle > .molecule-atom-hydrogen {
-  opacity: 0.68;
-  transform: scale(0.94);
-}
-
 .combustion-control-card {
   --control-accent: #14b8a6;
   --control-soft: #ecfdf5;
@@ -1433,10 +1126,6 @@ textarea {
   backdrop-filter: blur(14px);
 }
 
-.lab-output-surface {
-  min-width: 0;
-}
-
 .reagent-control-panel {
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
@@ -1444,56 +1133,6 @@ textarea {
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.9)),
     linear-gradient(135deg, rgba(20, 184, 166, 0.08), transparent 42%);
   padding: 1rem;
-}
-
-.lab-control-stack {
-  display: grid;
-  gap: 0.75rem;
-  align-self: start;
-}
-
-@media (min-width: 1024px) {
-  .lab-control-stack {
-    position: sticky;
-    top: 1rem;
-  }
-}
-
-.lab-control-section {
-  --control-accent: #8b5cf6;
-  --control-soft: #f5f3ff;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.82);
-  padding: 0.78rem;
-}
-
-.lab-control-heading {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  margin-bottom: 0.7rem;
-}
-
-.lab-step-index {
-  display: inline-flex;
-  width: 1.55rem;
-  height: 1.55rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: #0f172a;
-  color: #ffffff;
-  font-size: 0.78rem;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.lab-control-label {
-  color: #0f172a;
-  font-size: 0.92rem;
-  font-weight: 900;
-  letter-spacing: 0;
 }
 
 .reagent-panel-kicker {
@@ -1504,15 +1143,13 @@ textarea {
   text-transform: uppercase;
 }
 
-.reagent-selector,
-.lab-reagent-grid {
+.reagent-selector {
   display: grid;
   gap: 0.55rem;
   margin-top: 0.65rem;
 }
 
-.reagent-tab,
-.lab-reagent-button {
+.reagent-tab {
   --reagent-accent: #14b8a6;
   display: flex;
   min-height: 4.2rem;
@@ -1532,14 +1169,12 @@ textarea {
     transform 220ms ease;
 }
 
-.reagent-tab:hover,
-.lab-reagent-button:hover {
+.reagent-tab:hover {
   border-color: color-mix(in srgb, var(--reagent-accent) 34%, #cbd5e1);
   transform: translateY(-1px);
 }
 
-.reagent-tab-active,
-.lab-reagent-button-active {
+.reagent-tab-active {
   border-color: var(--reagent-accent);
   background:
     linear-gradient(180deg, #ffffff, #f8fafc),
@@ -1548,8 +1183,7 @@ textarea {
   color: #0f172a;
 }
 
-.reagent-swatch,
-.lab-reagent-dot {
+.reagent-swatch {
   flex: 0 0 auto;
   width: 0.8rem;
   height: 0.8rem;
@@ -1559,8 +1193,7 @@ textarea {
 }
 
 .reagent-tab strong,
-.reagent-tab small,
-.lab-reagent-button span:last-child {
+.reagent-tab small {
   display: block;
 }
 
@@ -1575,13 +1208,6 @@ textarea {
   color: #64748b;
   font-size: 0.72rem;
   font-weight: 700;
-}
-
-.lab-reagent-button {
-  min-height: 3rem;
-  border-radius: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 800;
 }
 
 .beaker-visual {
@@ -1890,298 +1516,6 @@ textarea {
   transform: scale(1);
 }
 
-.reagent-dropper {
-  position: absolute;
-  top: 2rem;
-  left: 50%;
-  width: 3.5rem;
-  height: 7rem;
-  border-radius: 999px 999px 0.35rem 0.35rem;
-  background: linear-gradient(180deg, #0f172a, #334155);
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
-  transform: translateX(-50%) rotate(-8deg);
-}
-
-.reagent-dropper::after {
-  position: absolute;
-  right: 0.95rem;
-  bottom: -1.8rem;
-  width: 0.7rem;
-  height: 1.9rem;
-  border-radius: 999px;
-  background: var(--reagent-initial);
-  content: "";
-}
-
-.reagent-dropper span {
-  position: absolute;
-  right: 0.8rem;
-  bottom: -3.1rem;
-  width: 0.65rem;
-  height: 0.65rem;
-  border-radius: 999px;
-  animation: reagent-drop 1380ms ease-in-out infinite;
-  background: var(--reagent-initial);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--reagent-initial) 52%, transparent);
-}
-
-.beaker-shell {
-  position: relative;
-  width: min(100%, 18.6rem);
-  margin-top: 4.6rem;
-  filter: drop-shadow(0 26px 30px rgba(15, 23, 42, 0.09));
-  transform: translateY(-1.8rem);
-}
-
-.beaker-mouth {
-  position: relative;
-  z-index: 5;
-  width: 92%;
-  height: 1.25rem;
-  margin: 0 auto -1rem;
-  border: 2px solid rgba(71, 85, 105, 0.58);
-  border-radius: 999px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(226, 232, 240, 0.5)),
-    rgba(255, 255, 255, 0.56);
-  box-shadow:
-    inset 0 2px 6px rgba(255, 255, 255, 0.95),
-    0 2px 0 rgba(100, 116, 139, 0.18);
-}
-
-.beaker-mouth::after {
-  position: absolute;
-  right: 12%;
-  bottom: 0.08rem;
-  left: 12%;
-  height: 0.28rem;
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.18);
-  content: "";
-}
-
-.beaker-spout {
-  position: absolute;
-  top: -0.03rem;
-  left: 6.8%;
-  z-index: 6;
-  width: 2rem;
-  height: 1.15rem;
-  border-top: 2px solid rgba(71, 85, 105, 0.62);
-  border-left: 2px solid rgba(71, 85, 105, 0.48);
-  border-radius: 70% 0 0 20%;
-  background: rgba(255, 255, 255, 0.82);
-  transform: rotate(-17deg);
-}
-
-.beaker-glass {
-  position: relative;
-  height: 17.7rem;
-  overflow: hidden;
-  border: 2px solid rgba(71, 85, 105, 0.46);
-  border-top-color: rgba(71, 85, 105, 0.3);
-  border-radius: 0.85rem 0.85rem 2.15rem 2.15rem;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.85), transparent 16% 76%, rgba(255, 255, 255, 0.62)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(226, 232, 240, 0.13)),
-    rgba(255, 255, 255, 0.2);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.82),
-    inset 0 -18px 24px rgba(100, 116, 139, 0.08);
-}
-
-.beaker-glass::before,
-.beaker-glass::after {
-  position: absolute;
-  top: 0.8rem;
-  bottom: 1.3rem;
-  z-index: 4;
-  width: 1.15rem;
-  border-radius: 999px;
-  content: "";
-  pointer-events: none;
-}
-
-.beaker-glass::before {
-  left: 0.8rem;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.72), transparent);
-}
-
-.beaker-glass::after {
-  right: 0.75rem;
-  background: linear-gradient(270deg, rgba(255, 255, 255, 0.42), transparent);
-}
-
-.beaker-shine {
-  position: absolute;
-  z-index: 4;
-  pointer-events: none;
-}
-
-.beaker-shine-left {
-  top: 2rem;
-  left: 2.1rem;
-  width: 0.55rem;
-  height: 10.4rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.1));
-}
-
-.beaker-shine-right {
-  top: 3.25rem;
-  right: 2.35rem;
-  width: 0.32rem;
-  height: 6.8rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.beaker-measure {
-  position: absolute;
-  right: 1.55rem;
-  z-index: 5;
-  width: 2.6rem;
-  height: 2px;
-  border-radius: 999px;
-  background: rgba(51, 65, 85, 0.52);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
-}
-
-.beaker-measure-1 {
-  top: 32%;
-}
-
-.beaker-measure-2 {
-  top: 48%;
-}
-
-.beaker-measure-3 {
-  top: 64%;
-}
-
-.beaker-liquid {
-  position: absolute;
-  right: 1rem;
-  bottom: 1.15rem;
-  left: 1rem;
-  height: 58%;
-  overflow: hidden;
-  border-radius: 0.18rem 0.18rem 1.45rem 1.45rem;
-  animation: reagent-color-shift 980ms ease 240ms both;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent 32%),
-    var(--reagent-initial);
-  box-shadow:
-    inset 0 12px 24px rgba(255, 255, 255, 0.28),
-    inset 0 -18px 32px rgba(15, 23, 42, 0.12);
-}
-
-.beaker-liquid::before {
-  position: absolute;
-  top: -0.48rem;
-  right: 0;
-  left: 0;
-  z-index: 2;
-  height: 1.05rem;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.38);
-  content: "";
-  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.16);
-}
-
-.beaker-base {
-  position: absolute;
-  right: 1.1rem;
-  bottom: 0.7rem;
-  left: 1.1rem;
-  z-index: 5;
-  height: 1.15rem;
-  border-radius: 0 0 1.45rem 1.45rem;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(148, 163, 184, 0.22)),
-    rgba(255, 255, 255, 0.18);
-  box-shadow:
-    inset 0 -2px 0 rgba(100, 116, 139, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  pointer-events: none;
-}
-
-.liquid-wave {
-  position: absolute;
-  right: -12%;
-  left: -12%;
-  height: 1.2rem;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.44);
-}
-
-.liquid-wave-front {
-  top: -0.45rem;
-  animation: liquid-wave 2800ms ease-in-out infinite;
-}
-
-.liquid-wave-back {
-  top: -0.2rem;
-  opacity: 0.38;
-  animation: liquid-wave 3200ms ease-in-out infinite reverse;
-}
-
-.precipitate-dot {
-  position: absolute;
-  bottom: 0.9rem;
-  width: 0.72rem;
-  height: 0.72rem;
-  border-radius: 999px;
-  background: #f8fafc;
-  opacity: 0;
-  transform: translateY(0.8rem) scale(0.8);
-}
-
-.precipitate-dot-1 {
-  left: 30%;
-}
-
-.precipitate-dot-2 {
-  left: 50%;
-  animation-delay: 120ms;
-}
-
-.precipitate-dot-3 {
-  left: 67%;
-  animation-delay: 220ms;
-}
-
-.reagent-phase-precipitate .precipitate-dot,
-.reagent-phase-white-precipitate .precipitate-dot,
-.reagent-phase-changed .precipitate-dot {
-  animation: precipitate-rise 760ms ease 560ms both;
-  opacity: 1;
-}
-
-.reagent-phase-precipitate .precipitate-dot,
-.reagent-phase-changed .precipitate-dot {
-  background: #78350f;
-}
-
-.reagent-phase-white-precipitate .precipitate-dot {
-  background: #ffffff;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.88);
-}
-
-.reagent-phase-decolorized .beaker-liquid {
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.56), transparent 30%),
-    var(--reagent-final);
-  box-shadow:
-    inset 0 12px 24px rgba(255, 255, 255, 0.46),
-    inset 0 -18px 32px rgba(15, 23, 42, 0.06);
-}
-
-.reagent-phase-decolorized .liquid-wave {
-  background: rgba(148, 163, 184, 0.22);
-}
-
 .reagent-stage-caption {
   position: absolute;
   right: 1rem;
@@ -2248,550 +1582,6 @@ textarea {
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: 0;
-}
-
-.lab-hero {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 1.25rem;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 1.75rem;
-}
-
-.lab-eyebrow {
-  color: #0f766e;
-  font-size: 0.88rem;
-  font-weight: 900;
-  letter-spacing: 0;
-}
-
-.lab-current-chip {
-  min-width: min(100%, 18rem);
-  border: 1px solid #dbe4ef;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.06);
-  padding: 1rem;
-}
-
-.lab-current-chip span,
-.lab-current-chip small {
-  display: block;
-  color: #64748b;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0;
-}
-
-.lab-current-chip strong {
-  display: block;
-  margin-top: 0.45rem;
-  color: #0f172a;
-  font-size: 1.02rem;
-  font-weight: 900;
-  line-height: 1.35;
-  white-space: nowrap;
-}
-
-.lab-current-chip small {
-  margin-top: 0.28rem;
-}
-
-.lab-type-selector {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.48rem;
-}
-
-.lab-type-card {
-  --type-accent: #14b8a6;
-  --type-soft: #ecfdf5;
-  display: grid;
-  min-height: 6.2rem;
-  align-content: space-between;
-  gap: 0.42rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  color: #0f172a;
-  padding: 0.62rem;
-  text-align: left;
-  transition:
-    border-color 180ms ease,
-    background 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
-}
-
-.lab-type-card:hover {
-  border-color: color-mix(in srgb, var(--type-accent) 42%, #cbd5e1);
-  transform: translateY(-1px);
-}
-
-.lab-type-card-active {
-  border-color: var(--type-accent);
-  background: linear-gradient(180deg, var(--type-soft), #ffffff);
-  box-shadow: 0 12px 26px color-mix(in srgb, var(--type-accent) 13%, transparent);
-}
-
-.lab-type-card-teal {
-  --type-accent: #14b8a6;
-  --type-soft: #ecfdf5;
-}
-
-.lab-type-card-amber {
-  --type-accent: #f59e0b;
-  --type-soft: #fffbeb;
-}
-
-.lab-type-card-violet {
-  --type-accent: #8b5cf6;
-  --type-soft: #f5f3ff;
-}
-
-.lab-type-rule {
-  display: inline-flex;
-  width: fit-content;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--type-accent) 10%, #ffffff);
-  color: color-mix(in srgb, var(--type-accent) 72%, #0f172a);
-  font-size: 0.78rem;
-  font-weight: 900;
-  line-height: 1;
-  padding: 0.34rem 0.44rem;
-}
-
-.lab-type-name {
-  color: #64748b;
-  font-size: 0.78rem;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.lab-type-card strong {
-  font-size: 0.98rem;
-  font-weight: 900;
-  line-height: 1.1;
-}
-
-.lab-carbon-readout {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  padding: 0.78rem;
-}
-
-.lab-carbon-readout span {
-  display: block;
-  color: #64748b;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0;
-}
-
-.lab-carbon-readout strong {
-  display: block;
-  color: #0f172a;
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.lab-carbon-readout em {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: #ecfdf5;
-  color: #0f766e;
-  font-size: 0.92rem;
-  font-style: normal;
-  font-weight: 900;
-  padding: 0.5rem 0.65rem;
-}
-
-.lab-carbon-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.42rem;
-  margin-top: 0.72rem;
-}
-
-.lab-carbon-pill {
-  min-width: 2.2rem;
-  border: 1px solid #dbe4ef;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 900;
-  line-height: 1;
-  padding: 0.48rem 0.66rem;
-  transition:
-    border-color 180ms ease,
-    background 180ms ease,
-    color 180ms ease,
-    transform 180ms ease;
-}
-
-.lab-carbon-pill:hover {
-  transform: translateY(-1px);
-}
-
-.lab-carbon-pill-active {
-  border-color: #0f172a;
-  background: #0f172a;
-  color: #ffffff;
-}
-
-.lab-primary-result {
-  --lab-accent: #14b8a6;
-  --reagent-initial: #7c3aed;
-  --reagent-final: #e2e8f0;
-  --reagent-accent: #8b5cf6;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.88fr);
-  gap: 1rem;
-  align-items: stretch;
-  border: 1px solid color-mix(in srgb, var(--lab-accent) 30%, #dbe4ef);
-  border-radius: 0.5rem;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--lab-accent) 8%, #ffffff), #ffffff 52%),
-    linear-gradient(180deg, #ffffff, #f8fafc);
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
-  padding: 1rem;
-}
-
-.lab-primary-result-teal {
-  --lab-accent: #14b8a6;
-}
-
-.lab-primary-result-amber {
-  --lab-accent: #f59e0b;
-}
-
-.lab-primary-result-violet {
-  --lab-accent: #8b5cf6;
-}
-
-.lab-primary-copy {
-  min-width: 0;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.72);
-  padding: 1.1rem;
-}
-
-.lab-comment {
-  display: inline-flex;
-  margin-top: 0.9rem;
-  border: 1px solid color-mix(in srgb, var(--reagent-accent) 28%, #dbe4ef);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--reagent-accent) 9%, #ffffff);
-  color: #0f172a;
-  font-size: 1rem;
-  font-weight: 900;
-  line-height: 1.3;
-  padding: 0.62rem 0.82rem;
-}
-
-.lab-type-badge,
-.lab-outcome-badge {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid #e2e8f0;
-  border-radius: 999px;
-  font-size: 0.82rem;
-  font-weight: 900;
-  line-height: 1;
-  padding: 0.52rem 0.72rem;
-}
-
-.lab-type-badge-teal {
-  border-color: #99f6e4;
-  background: #ecfdf5;
-  color: #134e4a;
-}
-
-.lab-type-badge-amber {
-  border-color: #fde68a;
-  background: #fffbeb;
-  color: #78350f;
-}
-
-.lab-type-badge-violet {
-  border-color: #ddd6fe;
-  background: #f5f3ff;
-  color: #4c1d95;
-}
-
-.lab-outcome-badge {
-  background: #f8fafc;
-  color: #334155;
-  box-shadow: inset 0 0 0 1px #dbe4ef;
-}
-
-.lab-outcome-badge-reactive {
-  background: #ecfdf5;
-  color: #065f46;
-  box-shadow: inset 0 0 0 1px #99f6e4;
-}
-
-.lab-outcome-badge-neutral {
-  background: #f8fafc;
-  color: #475569;
-  box-shadow: inset 0 0 0 1px #cbd5e1;
-}
-
-.lab-preview {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  justify-items: center;
-  gap: 0.8rem;
-  min-height: 100%;
-  overflow: hidden;
-  border: 1px solid #dbe4ef;
-  border-radius: 0.5rem;
-  background:
-    linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
-    linear-gradient(135deg, #ffffff, color-mix(in srgb, var(--reagent-accent) 8%, #f8fafc));
-  background-size: 3rem 3rem, 3rem 3rem, auto;
-  padding: 1rem;
-}
-
-.lab-preview-chip {
-  display: grid;
-  min-width: 0;
-  min-height: 7rem;
-  width: 100%;
-  align-content: center;
-  justify-items: center;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.84);
-  padding: 0.8rem;
-  text-align: center;
-}
-
-.lab-preview-chip span {
-  color: #64748b;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0;
-}
-
-.lab-preview-chip strong {
-  margin-top: 0.48rem;
-  color: #0f172a;
-  font-size: 1.35rem;
-  font-weight: 900;
-  line-height: 1.2;
-}
-
-.lab-preview-chip-result strong {
-  font-size: 1rem;
-}
-
-.lab-mini-beaker {
-  position: relative;
-  display: flex;
-  width: 6.7rem;
-  height: 8rem;
-  overflow: hidden;
-  align-items: flex-end;
-  justify-content: center;
-  border: 1px solid rgba(148, 163, 184, 0.68);
-  border-top-width: 0;
-  border-radius: 0 0 1.2rem 1.2rem;
-  background: rgba(255, 255, 255, 0.58);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
-}
-
-.lab-mini-liquid {
-  position: relative;
-  width: calc(100% - 0.9rem);
-  height: 58%;
-  overflow: hidden;
-  border-radius: 0 0 0.9rem 0.9rem;
-  background: var(--reagent-initial);
-}
-
-.lab-liquid-layer,
-.lab-liquid-shine {
-  position: absolute;
-  inset: 0;
-}
-
-.lab-liquid-layer {
-  background: var(--reagent-initial);
-}
-
-.lab-liquid-layer-final {
-  background: var(--reagent-final);
-  transform: translateY(105%);
-  animation: lab-liquid-reveal 1600ms cubic-bezier(0.2, 0.72, 0.18, 1) 120ms both;
-}
-
-.lab-liquid-shine {
-  z-index: 2;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.36), transparent 38%);
-  pointer-events: none;
-}
-
-.lab-precipitate-dot {
-  position: absolute;
-  z-index: 3;
-  bottom: 0.55rem;
-  width: 0.48rem;
-  height: 0.48rem;
-  border-radius: 999px;
-  background: #ffffff;
-  opacity: 0;
-}
-
-.lab-precipitate-dot-1 {
-  left: 28%;
-}
-
-.lab-precipitate-dot-2 {
-  left: 50%;
-}
-
-.lab-precipitate-dot-3 {
-  left: 66%;
-}
-
-.reagent-phase-precipitate .lab-precipitate-dot,
-.reagent-phase-white-precipitate .lab-precipitate-dot {
-  animation: precipitate-rise 680ms ease 1380ms both;
-}
-
-.reagent-phase-precipitate .lab-precipitate-dot {
-  background: #78350f;
-}
-
-.reagent-phase-white-precipitate .lab-precipitate-dot {
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  background: #ffffff;
-}
-
-.lab-compact-summary {
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.9rem;
-}
-
-.lab-compact-summary-heading {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-}
-
-.lab-compact-summary-heading span {
-  color: #64748b;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0;
-}
-
-.lab-compact-summary-heading strong {
-  color: #0f172a;
-  font-size: 1rem;
-  font-weight: 900;
-}
-
-.lab-compact-metrics {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 0.8rem;
-}
-
-.lab-compact-metrics div {
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: #f8fafc;
-  padding: 0.72rem 0.8rem;
-}
-
-.lab-compact-metrics span,
-.lab-compact-metrics strong {
-  display: block;
-  letter-spacing: 0;
-}
-
-.lab-compact-metrics span {
-  color: #64748b;
-  font-size: 0.76rem;
-  font-weight: 900;
-}
-
-.lab-compact-metrics strong {
-  margin-top: 0.32rem;
-  color: #0f172a;
-  font-size: 0.98rem;
-  font-weight: 900;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.lab-equation-details {
-  margin-top: 0.8rem;
-  border-top: 1px solid #e2e8f0;
-  padding-top: 0.75rem;
-}
-
-.lab-equation-details summary {
-  cursor: pointer;
-  color: #475569;
-  font-size: 0.86rem;
-  font-weight: 900;
-  letter-spacing: 0;
-}
-
-.lab-equation-details p {
-  margin-top: 0.65rem;
-  color: #0f172a;
-  font-size: 0.98rem;
-  font-weight: 800;
-  line-height: 1.65;
-}
-
-@keyframes lab-liquid-reveal {
-  from {
-    transform: translateY(105%);
-  }
-
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes reagent-drop {
-  0%,
-  28% {
-    opacity: 0;
-    transform: translateY(-0.4rem) scale(0.8);
-  }
-
-  42% {
-    opacity: 1;
-  }
-
-  78%,
-  100% {
-    opacity: 0;
-    transform: translateY(5.5rem) scale(1);
-  }
 }
 
 @keyframes reagent-svg-drop {
@@ -2909,45 +1699,6 @@ textarea {
   }
 }
 
-@keyframes reagent-color-shift {
-  from {
-    background-color: var(--reagent-initial);
-  }
-
-  to {
-    background-color: var(--reagent-final);
-  }
-}
-
-@keyframes liquid-wave {
-  0%,
-  100% {
-    transform: translateX(-4%);
-  }
-
-  50% {
-    transform: translateX(4%);
-  }
-}
-
-@keyframes precipitate-rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.8rem) scale(0.8);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@media (max-width: 1180px) {
-  .lab-primary-result {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 760px) {
   .reagent-lab-surface,
   .reagent-result-panel {
@@ -2955,66 +1706,9 @@ textarea {
     padding: 0.85rem;
   }
 
-  .lab-hero {
-    display: grid;
-    align-items: start;
-  }
-
-  .lab-current-chip {
-    width: 100%;
-  }
-
-  .lab-primary-result,
-  .lab-primary-copy,
-  .lab-compact-summary {
-    padding: 0.85rem;
-  }
-
   .reagent-stage {
     min-height: 24rem;
     padding: 1rem;
-  }
-
-  .beaker-shell {
-    width: min(100%, 15.5rem);
-  }
-
-  .beaker-glass {
-    height: 15.5rem;
-  }
-
-  .lab-preview {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-
-  .lab-compact-metrics {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lab-liquid-layer-final {
-    animation: none;
-    transform: translateY(0);
-  }
-
-  .reagent-phase-precipitate .lab-precipitate-dot,
-  .reagent-phase-white-precipitate .lab-precipitate-dot {
-    animation: none;
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@media (max-width: 520px) {
-  .lab-hero .korean-keep {
-    overflow-wrap: anywhere;
-    word-break: normal;
-  }
-
-  .lab-type-selector {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -3208,11 +1902,6 @@ textarea {
     padding: 0.9rem;
   }
 
-  .combustion-stage-grid {
-    min-height: 11.25rem;
-    gap: 0.75rem;
-  }
-
   .reaction-scene {
     min-height: 11.85rem;
     gap: 0.65rem;
@@ -3227,11 +1916,6 @@ textarea {
 
   .reaction-molecule-oxygen {
     width: min(100%, 10.5rem);
-  }
-
-  .reaction-zone {
-    min-height: 8.3rem;
-    padding: 0.65rem;
   }
 
   .molecule-card {
@@ -3264,18 +1948,6 @@ textarea {
 
   .combustion-summary-card strong {
     font-size: 1rem;
-  }
-}
-
-@keyframes atom-arrive {
-  from {
-    opacity: 0;
-    transform: translateY(0.8rem) scale(0.9);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
@@ -3408,11 +2080,6 @@ textarea {
     padding: 1rem;
   }
 
-  .combustion-stage-grid {
-    min-height: auto;
-    grid-template-columns: 1fr;
-  }
-
   .reaction-scene {
     min-height: auto;
     grid-template-columns: 1fr;
@@ -3466,15 +2133,1752 @@ textarea {
     background: linear-gradient(180deg, transparent, var(--stage-accent), transparent);
   }
 
-  .reaction-zone {
-    min-height: 7.5rem;
-  }
-
   .molecule-product-grid {
     grid-template-columns: 1fr;
   }
 
   .reaction-flow-line::after {
     display: none;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}
+
+.lab-minimal-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 251, 0.94) 42%, rgba(241, 248, 245, 0.92)),
+    linear-gradient(120deg, rgba(20, 184, 166, 0.1), transparent 38%, rgba(245, 158, 11, 0.1));
+  color: #0f172a;
+}
+
+.lab-minimal-shell {
+  width: min(100%, 96rem);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 1.3rem clamp(1rem, 3vw, 2.5rem) 2.5rem;
+}
+
+.lab-visual-workbench {
+  display: grid;
+  min-height: min(42rem, calc(100vh - 8.5rem));
+  grid-template-columns: minmax(16rem, 19.5rem) minmax(0, 1fr);
+  gap: clamp(1rem, 2.4vw, 2rem);
+  align-items: stretch;
+}
+
+.lab-icon-dock {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  min-height: 100%;
+}
+
+.lab-control-container {
+  display: grid;
+  min-width: 0;
+  gap: 0.62rem;
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(248, 250, 252, 0.62)),
+    rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.88) inset,
+    0 18px 44px rgba(15, 23, 42, 0.06);
+  padding: 0.72rem;
+}
+
+.lab-control-title {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.lab-control-container-carbon {
+  --dock-accent: #0f172a;
+}
+
+.lab-control-container-action {
+  --dock-accent: #f97316;
+  align-content: stretch;
+}
+
+.lab-control-container .lab-carbon-strip {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.lab-output-column {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+}
+
+.lab-icon-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.62rem;
+}
+
+.lab-icon-button {
+  --dock-accent: #14b8a6;
+  display: grid;
+  min-height: 6.4rem;
+  min-width: 0;
+  align-content: center;
+  gap: 0.34rem;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.78)),
+    #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset,
+    0 14px 34px rgba(15, 23, 42, 0.07);
+  cursor: pointer;
+  padding: 0.72rem 0.58rem;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease,
+    background 220ms ease;
+}
+
+.lab-icon-button:hover {
+  border-color: color-mix(in srgb, var(--dock-accent) 54%, #cbd5e1);
+  transform: translateY(-2px);
+}
+
+.lab-icon-button:focus-visible,
+.lab-carbon-token:focus-visible,
+.lab-carbon-step:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--dock-accent, #14b8a6) 28%, transparent);
+  outline-offset: 4px;
+}
+
+.lab-icon-button-active {
+  border-color: color-mix(in srgb, var(--dock-accent) 72%, #ffffff);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--dock-accent) 13%, #ffffff), #ffffff),
+    #ffffff;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--dock-accent) 24%, transparent) inset,
+    0 22px 42px color-mix(in srgb, var(--dock-accent) 17%, transparent);
+  transform: translateY(-2px) scale(1.015);
+}
+
+.lab-icon-button-teal {
+  --dock-accent: #14b8a6;
+}
+
+.lab-icon-button-amber {
+  --dock-accent: #f59e0b;
+}
+
+.lab-icon-button-violet {
+  --dock-accent: #8b5cf6;
+}
+
+.lab-option-label,
+.lab-option-sub {
+  display: block;
+  max-width: 100%;
+  text-align: center;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.lab-option-label {
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.lab-option-sub {
+  color: #64748b;
+  font-size: 0.64rem;
+  font-weight: 850;
+  line-height: 1.12;
+}
+
+.lab-type-glyph {
+  display: block;
+  width: min(100%, 4.25rem);
+  height: auto;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.lab-glyph-atom-node {
+  filter: drop-shadow(0 4px 5px rgba(15, 23, 42, 0.2));
+}
+
+.lab-glyph-atom-fill {
+  fill: #0f172a;
+  stroke: rgba(15, 23, 42, 0.08);
+  stroke-width: 1;
+}
+
+.lab-glyph-atom-highlight {
+  fill: rgba(255, 255, 255, 0.82);
+}
+
+.lab-glyph-bond-line {
+  stroke: #334155;
+  stroke-linecap: round;
+  stroke-width: 2.2;
+}
+
+.lab-carbon-strip {
+  --dock-accent: #0f172a;
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+  gap: 0.55rem;
+  align-items: center;
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.07);
+  padding: 0.72rem;
+}
+
+.lab-carbon-options {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.38rem;
+}
+
+.lab-carbon-token {
+  --dock-accent: #0f172a;
+  display: grid;
+  width: clamp(2.36rem, 4.5vw, 2.9rem);
+  height: clamp(2.36rem, 4.5vw, 2.9rem);
+  align-content: center;
+  gap: 0.16rem;
+  place-items: center;
+  border: 1px solid #dbe4ef;
+  border-radius: 999px;
+  background: #ffffff;
+  cursor: pointer;
+  padding: 0.28rem;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.lab-carbon-token:hover {
+  transform: translateY(-1px);
+}
+
+.lab-carbon-token-active {
+  border-color: #0f172a;
+  background: #0f172a;
+  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.18);
+}
+
+.lab-carbon-number {
+  color: #0f172a;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.lab-carbon-token-active .lab-carbon-number {
+  color: #ffffff;
+}
+
+.lab-carbon-dots {
+  display: grid;
+  width: 100%;
+  max-width: 1.28rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.1rem;
+}
+
+.lab-carbon-dots span {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.lab-carbon-token-active .lab-carbon-dots span {
+  background: #ffffff;
+}
+
+.lab-carbon-step {
+  position: relative;
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 1px solid #dbe4ef;
+  border-radius: 999px;
+  background: #ffffff;
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.lab-carbon-step:hover:not(:disabled) {
+  border-color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.lab-carbon-step:disabled {
+  cursor: default;
+  opacity: 0.36;
+}
+
+.lab-carbon-step span,
+.lab-carbon-step span::after {
+  display: block;
+  width: 0.8rem;
+  height: 2px;
+  border-radius: 999px;
+  background: #0f172a;
+  content: "";
+}
+
+.lab-carbon-step span {
+  position: relative;
+}
+
+.lab-carbon-step span::after {
+  position: absolute;
+  inset: 0;
+}
+
+.lab-carbon-step-plus span::after {
+  transform: rotate(90deg);
+}
+
+.lab-reagent-icon-button {
+  min-height: 7.15rem;
+}
+
+.lab-reagent-icon-button .lab-reagent-glyph {
+  width: min(54%, 3.3rem);
+}
+
+.lab-reagent-icon-button .lab-option-label {
+  min-height: 1.72rem;
+  align-content: center;
+  font-size: 0.7rem;
+}
+
+.lab-reagent-glyph {
+  display: grid;
+  width: min(72%, 4.3rem);
+  place-items: center;
+}
+
+.lab-reagent-glyph svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 16px 24px color-mix(in srgb, var(--reagent-accent) 24%, transparent));
+}
+
+.lab-reagent-drop {
+  fill: var(--reagent-base);
+  stroke: color-mix(in srgb, var(--reagent-accent) 72%, #ffffff);
+  stroke-width: 2.4;
+}
+
+.lab-reagent-shine {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.64);
+  stroke-linecap: round;
+  stroke-width: 4;
+}
+
+.lab-reagent-bubble {
+  fill: rgba(255, 247, 237, 0.72);
+}
+
+.lab-reagent-grain {
+  fill: #78350f;
+}
+
+.lab-reagent-silver-dot {
+  fill: #ffffff;
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+}
+
+.lab-action-strip {
+  display: flex;
+  justify-content: center;
+}
+
+.lab-control-container-action .lab-action-strip {
+  height: 100%;
+}
+
+.lab-control-container-action .lab-combust-trigger {
+  width: 100%;
+}
+
+.lab-combust-trigger {
+  --dock-accent: #f97316;
+  display: grid;
+  width: min(100%, 9.2rem);
+  min-height: 6.15rem;
+  align-content: center;
+  gap: 0.36rem;
+  place-items: center;
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 247, 237, 0.72)),
+    #ffffff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.07);
+  cursor: pointer;
+  padding: 0.72rem;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+.lab-combust-trigger:hover {
+  border-color: #fb923c;
+  transform: translateY(-2px);
+}
+
+.lab-combust-trigger:focus-visible {
+  outline: 3px solid rgba(249, 115, 22, 0.25);
+  outline-offset: 4px;
+}
+
+.lab-combust-trigger-active {
+  border-color: #f97316;
+  box-shadow:
+    0 0 0 1px rgba(249, 115, 22, 0.26) inset,
+    0 22px 42px rgba(249, 115, 22, 0.18);
+  transform: translateY(-2px);
+}
+
+.lab-combust-trigger svg,
+.lab-combust-fire svg {
+  display: block;
+  width: min(48%, 3.4rem);
+  overflow: visible;
+  filter: drop-shadow(0 18px 26px rgba(249, 115, 22, 0.25));
+}
+
+.lab-combust-flame-outer {
+  fill: #fb923c;
+  stroke: #f97316;
+  stroke-width: 2.2;
+}
+
+.lab-combust-flame-inner {
+  fill: #fef3c7;
+  stroke: #f59e0b;
+  stroke-width: 1.6;
+}
+
+.lab-cinematic-stage {
+  --lab-accent: #8b5cf6;
+  --reagent-initial: #7c3aed;
+  --reagent-final: #7c3aed;
+  position: relative;
+  display: grid;
+  min-height: 42rem;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) minmax(5.8rem, 0.28fr) minmax(13rem, 0.68fr);
+  gap: clamp(0.8rem, 2vw, 2rem);
+  align-items: center;
+  border: 1px solid rgba(203, 213, 225, 0.86);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.88)),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+  background-size: auto, 4rem 4rem, 4rem 4rem;
+  box-shadow:
+    0 40px 90px rgba(15, 23, 42, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.92) inset;
+  isolation: isolate;
+  padding: clamp(1.2rem, 3vw, 3rem);
+}
+
+.lab-cinematic-stage-combust {
+  min-height: 34rem;
+  grid-template-columns: 1fr;
+}
+
+.lab-stage-glow {
+  position: absolute;
+  inset: 9%;
+  z-index: 0;
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(100deg, transparent 0%, color-mix(in srgb, var(--lab-accent) 17%, transparent) 48%, transparent 100%),
+    linear-gradient(180deg, rgba(20, 184, 166, 0.08), transparent 62%);
+  filter: blur(10px);
+  opacity: 0.86;
+  transform: scale(1);
+  transition:
+    background 420ms ease,
+    opacity 420ms ease;
+}
+
+.lab-stage-molecule,
+.lab-stage-reagent,
+.lab-stage-beaker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-width: 0;
+  place-items: center;
+}
+
+.lab-stage-molecule {
+  min-height: 19rem;
+}
+
+.lab-molecule-chain {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 24px 38px rgba(15, 23, 42, 0.13));
+}
+
+.lab-molecule-unit {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.lab-chain-bond {
+  display: grid;
+  width: clamp(0.7rem, 1.75vw, 2.05rem);
+  flex: 0 1 auto;
+  gap: 0.18rem;
+  margin: 0 -0.03rem;
+}
+
+.lab-chain-bond span {
+  height: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lab-accent, #14b8a6) 34%, #0f172a);
+}
+
+.lab-chain-bond-2,
+.lab-chain-bond-3 {
+  gap: 0.13rem;
+}
+
+.lab-carbon-core {
+  position: relative;
+  display: grid;
+  width: clamp(1.55rem, 3.2vw, 2.95rem);
+  height: clamp(1.55rem, 3.2vw, 2.95rem);
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.94), transparent 25%),
+    #0f172a;
+  box-shadow:
+    0 16px 28px rgba(15, 23, 42, 0.2),
+    0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+.lab-h-orbit {
+  position: absolute;
+  width: 0.42rem;
+  height: 0.42rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.1);
+}
+
+.lab-h-orbit-top {
+  top: -0.56rem;
+}
+
+.lab-h-orbit-bottom {
+  bottom: -0.56rem;
+}
+
+.lab-molecule-chain-alkene .lab-chain-bond span {
+  background: color-mix(in srgb, #f59e0b 42%, #0f172a);
+}
+
+.lab-molecule-chain-alkyne .lab-chain-bond span {
+  background: color-mix(in srgb, #8b5cf6 42%, #0f172a);
+}
+
+.lab-stage-reagent {
+  min-height: 17rem;
+}
+
+.lab-stage-reagent .lab-reagent-glyph {
+  width: clamp(4.6rem, 9vw, 7.2rem);
+  animation: lab-reagent-float 2800ms ease-in-out infinite;
+}
+
+.lab-pour-trail {
+  position: absolute;
+  top: 50%;
+  right: -40%;
+  width: clamp(4rem, 9vw, 8rem);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--reagent-accent), transparent);
+  opacity: 0.58;
+}
+
+.lab-pour-trail::before,
+.lab-pour-trail::after {
+  position: absolute;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--reagent-accent);
+  content: "";
+  transform: translateY(-50%);
+  animation: lab-drop-travel 1600ms cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+}
+
+.lab-pour-trail::after {
+  animation-delay: 520ms;
+  opacity: 0.62;
+}
+
+.lab-stage-beaker {
+  min-height: 27rem;
+}
+
+.lab-combust-visual {
+  --product-travel: clamp(8rem, 19vw, 16rem);
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  min-height: 27rem;
+  grid-template-columns: minmax(0, 1.08fr) minmax(6rem, 0.34fr) minmax(15rem, 0.82fr);
+  gap: clamp(1.4rem, 3.4vw, 3.2rem);
+  align-items: center;
+}
+
+.lab-combust-fuel,
+.lab-combust-fire,
+.lab-combust-products {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  place-items: center;
+}
+
+.lab-combust-fuel {
+  justify-items: end;
+  padding-right: clamp(0.45rem, 1.4vw, 1.2rem);
+}
+
+.lab-combust-fuel .lab-molecule-chain {
+  max-width: 100%;
+  justify-content: flex-end;
+  transform-origin: right center;
+}
+
+.lab-combust-fuel .lab-molecule-chain-medium {
+  transform: scale(0.92);
+}
+
+.lab-combust-fuel .lab-molecule-chain-long {
+  transform: scale(0.78);
+}
+
+.lab-combust-fuel .lab-carbon-core {
+  animation: lab-fuel-carbon-heat 2800ms ease-in-out infinite;
+}
+
+.lab-combust-fuel .lab-chain-bond span {
+  animation: lab-bond-heat 2200ms ease-in-out infinite;
+}
+
+.lab-combust-fuel .lab-chain-bond {
+  width: clamp(0.48rem, 1.05vw, 1.24rem);
+}
+
+.lab-combust-fuel .lab-carbon-core {
+  width: clamp(1.34rem, 2.4vw, 2.2rem);
+  height: clamp(1.34rem, 2.4vw, 2.2rem);
+}
+
+.lab-combust-fuel-heat {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.lab-combust-fuel-spark {
+  position: absolute;
+  top: 47%;
+  left: var(--fuel-spark-x);
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: #fed7aa;
+  box-shadow:
+    0 0 14px rgba(251, 146, 60, 0.72),
+    0 0 34px rgba(249, 115, 22, 0.3);
+  opacity: 0;
+  animation: lab-fuel-spark 2100ms ease-in-out infinite;
+  animation-delay: var(--fuel-spark-delay);
+}
+
+.lab-combust-fire {
+  min-height: 14rem;
+  justify-self: start;
+}
+
+.lab-combust-ring {
+  position: absolute;
+  z-index: 0;
+  width: clamp(5.6rem, 10vw, 8rem);
+  height: clamp(5.6rem, 10vw, 8rem);
+  border: 1px solid rgba(251, 146, 60, 0.34);
+  border-radius: 999px;
+  box-shadow: 0 0 42px rgba(249, 115, 22, 0.24);
+  opacity: 0;
+  animation: lab-combust-ring 2300ms ease-out infinite;
+}
+
+.lab-combust-ring-two {
+  animation-delay: 760ms;
+}
+
+.lab-combust-fire svg {
+  position: relative;
+  z-index: 2;
+  width: clamp(4.4rem, 7.4vw, 5.9rem);
+  animation: lab-combust-pulse 1600ms ease-in-out infinite;
+}
+
+.lab-oxygen-stream {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lab-oxygen-pair {
+  position: absolute;
+  top: 50%;
+  left: -3.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.12rem;
+  opacity: 0;
+  transform: translate(-2.4rem, var(--oxygen-y)) scale(0.72);
+  animation: lab-oxygen-feed 2600ms cubic-bezier(0.2, 0.72, 0.22, 1) infinite;
+  animation-delay: var(--oxygen-delay);
+}
+
+.lab-oxygen-pair::before {
+  position: absolute;
+  left: 50%;
+  width: 0.8rem;
+  height: 2px;
+  border-radius: 999px;
+  background: #93c5fd;
+  content: "";
+  transform: translateX(-50%);
+}
+
+.lab-oxygen-pair span {
+  position: relative;
+  z-index: 1;
+  width: 0.78rem;
+  height: 0.78rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 14px rgba(96, 165, 250, 0.24);
+}
+
+.lab-oxygen-dot {
+  position: absolute;
+  z-index: 3;
+  width: 0.78rem;
+  height: 0.78rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.25);
+  animation: lab-oxygen-drift 1800ms ease-in-out infinite;
+}
+
+.lab-oxygen-dot-one {
+  top: 18%;
+  left: 12%;
+}
+
+.lab-oxygen-dot-two {
+  right: 10%;
+  bottom: 22%;
+  animation-delay: 180ms;
+}
+
+.lab-oxygen-dot-three {
+  top: 54%;
+  left: 5%;
+  animation-delay: 360ms;
+}
+
+.lab-combust-products {
+  position: relative;
+  z-index: 3;
+  gap: 0.75rem;
+}
+
+.lab-combust-product-stream {
+  position: absolute;
+  top: 50%;
+  left: 43%;
+  z-index: 2;
+  width: var(--product-travel);
+  height: 12rem;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.lab-product-particle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0;
+  transform: translate(0, 0) scale(0.5);
+  animation: lab-product-flight 3100ms cubic-bezier(0.2, 0.72, 0.22, 1) infinite;
+  animation-delay: var(--product-delay);
+}
+
+.lab-product-particle span {
+  display: block;
+  width: 0.58rem;
+  height: 0.58rem;
+  border-radius: 999px;
+}
+
+.lab-product-particle span + span {
+  margin-left: -0.08rem;
+}
+
+.lab-product-particle-co2 span:nth-child(1),
+.lab-product-particle-co2 span:nth-child(3),
+.lab-product-particle-h2o span:nth-child(2) {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+}
+
+.lab-product-particle-co2 span:nth-child(2) {
+  background: #0f172a;
+}
+
+.lab-product-particle-h2o span:nth-child(1),
+.lab-product-particle-h2o span:nth-child(3) {
+  border: 1px solid #dbe4ef;
+  background: #ffffff;
+}
+
+.lab-product-card {
+  display: grid;
+  width: min(100%, 17rem);
+  min-height: 8.2rem;
+  align-content: center;
+  justify-items: center;
+  gap: 0.7rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  padding: 1rem;
+  animation: lab-product-card-glow 3100ms ease-in-out infinite;
+}
+
+.lab-product-card-h2o {
+  animation-delay: 420ms;
+}
+
+.lab-product-card strong {
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.lab-product-molecule {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lab-product-atom {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.lab-product-carbon {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.lab-product-oxygen {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #ef4444;
+}
+
+.lab-product-hydrogen {
+  border: 1px solid #dbe4ef;
+  background: #ffffff;
+  color: #64748b;
+}
+
+.lab-product-bond {
+  width: 1.05rem;
+  height: 2px;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.lab-apple-beaker {
+  position: relative;
+  display: grid;
+  width: clamp(12rem, 21vw, 17.5rem);
+  height: clamp(17rem, 31vw, 24rem);
+  place-items: end center;
+}
+
+.lab-beaker-lip {
+  position: absolute;
+  top: 0;
+  left: 7%;
+  width: 86%;
+  height: 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.72);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+.lab-beaker-glass {
+  position: absolute;
+  inset: 0.56rem 11% 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.74);
+  border-top: 0;
+  border-radius: 0 0 2.1rem 2.1rem;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.26) 18%, transparent 52%, rgba(255, 255, 255, 0.32)),
+    rgba(255, 255, 255, 0.34);
+  box-shadow:
+    0 28px 48px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.72) inset;
+}
+
+.lab-beaker-liquid {
+  position: absolute;
+  right: 0.62rem;
+  bottom: 0.62rem;
+  left: 0.62rem;
+  height: 58%;
+  overflow: hidden;
+  border-radius: 0 0 1.55rem 1.55rem;
+  background: var(--reagent-initial);
+  box-shadow:
+    0 -12px 30px color-mix(in srgb, var(--reagent-initial) 30%, transparent) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.26) inset;
+}
+
+.lab-beaker-liquid-initial,
+.lab-beaker-liquid-final,
+.lab-beaker-shine {
+  position: absolute;
+  inset: 0;
+}
+
+.lab-beaker-liquid-initial {
+  background: var(--reagent-initial);
+}
+
+.lab-beaker-liquid-final {
+  background: var(--reagent-final);
+  transform: translateY(108%);
+  animation: lab-apple-liquid-reveal 1500ms cubic-bezier(0.18, 0.82, 0.24, 1) 120ms both;
+}
+
+.lab-beaker-shine {
+  z-index: 4;
+  background:
+    linear-gradient(100deg, rgba(255, 255, 255, 0.36), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), transparent 34%);
+  pointer-events: none;
+}
+
+.lab-beaker-ripple {
+  position: absolute;
+  left: 50%;
+  z-index: 5;
+  width: 64%;
+  height: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  opacity: 0;
+  transform: translate(-50%, 0) scaleX(0.65);
+}
+
+.lab-beaker-ripple-one {
+  top: 18%;
+  animation: lab-liquid-ripple 1500ms ease 420ms both;
+}
+
+.lab-beaker-ripple-two {
+  top: 28%;
+  animation: lab-liquid-ripple 1500ms ease 760ms both;
+}
+
+.lab-beaker-precipitate {
+  position: absolute;
+  z-index: 6;
+  bottom: 0.78rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  background: #78350f;
+  opacity: 0;
+  transform: translateY(0.8rem) scale(0.7);
+}
+
+.lab-beaker-precipitate-one {
+  left: 24%;
+}
+
+.lab-beaker-precipitate-two {
+  left: 40%;
+}
+
+.lab-beaker-precipitate-three {
+  left: 56%;
+}
+
+.lab-beaker-precipitate-four {
+  left: 70%;
+}
+
+.reagent-phase-precipitate .lab-beaker-precipitate,
+.reagent-phase-white-precipitate .lab-beaker-precipitate,
+.reagent-phase-changed .lab-beaker-precipitate {
+  animation: lab-precipitate-settle 720ms ease 1240ms both;
+}
+
+.reagent-phase-precipitate .lab-beaker-precipitate,
+.reagent-phase-changed .lab-beaker-precipitate {
+  background: #78350f;
+}
+
+.reagent-phase-white-precipitate .lab-beaker-precipitate {
+  border: 1px solid rgba(148, 163, 184, 0.78);
+  background: #ffffff;
+}
+
+.reagent-phase-decolorized .lab-beaker-liquid-final {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 250, 252, 0.72)),
+    var(--reagent-final);
+}
+
+.lab-reaction-signal {
+  position: absolute;
+  top: 12%;
+  right: 7%;
+  z-index: 4;
+  display: grid;
+  width: 4.2rem;
+  height: 4.2rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--lab-accent) 24%, #dbe4ef);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.lab-reaction-signal span {
+  position: absolute;
+  display: block;
+}
+
+.lab-reaction-signal-reactive span {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lab-accent) 58%, #ffffff);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--lab-accent) 42%, transparent);
+  animation: lab-signal-spark 1300ms ease-in-out infinite;
+}
+
+.lab-reaction-signal-reactive span:nth-child(1) {
+  --spark-x: -0.9rem;
+  --spark-y: -0.65rem;
+}
+
+.lab-reaction-signal-reactive span:nth-child(2) {
+  width: 1.02rem;
+  height: 1.02rem;
+  animation-delay: 140ms;
+}
+
+.lab-reaction-signal-reactive span:nth-child(3) {
+  --spark-x: 0.92rem;
+  --spark-y: 0.7rem;
+  animation-delay: 280ms;
+}
+
+.lab-reaction-signal-neutral span {
+  width: 1.65rem;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.lab-reaction-signal-neutral span:nth-child(1) {
+  transform: translateY(-0.36rem);
+}
+
+.lab-reaction-signal-neutral span:nth-child(2) {
+  transform: translateY(0.36rem);
+}
+
+.lab-reaction-signal-neutral span:nth-child(3) {
+  width: 2.7rem;
+  height: 2.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.42);
+  background: transparent;
+  transform: none;
+}
+
+.lab-method-toast {
+  position: absolute;
+  top: clamp(0.8rem, 2vw, 1.4rem);
+  left: 50%;
+  z-index: 4;
+  width: min(calc(100% - 2rem), 36rem);
+  border: 1px solid rgba(203, 213, 225, 0.82);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.86)),
+    rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 28px 64px rgba(15, 23, 42, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.88) inset;
+  opacity: 0;
+  padding: 0.82rem;
+  pointer-events: none;
+  transform: translate(-50%, -0.7rem) scale(0.985);
+  transition:
+    opacity 240ms ease,
+    transform 240ms ease;
+}
+
+.lab-method-toast-visible {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.lab-method-toast-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+.lab-method-toast-meta span {
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.lab-method-toast-meta strong {
+  color: #0f172a;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.lab-method-toast-body {
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0, 1fr);
+  gap: 0.72rem;
+  align-items: center;
+}
+
+.lab-method-toast-index {
+  display: inline-grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  place-items: center;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.lab-method-toast code {
+  display: block;
+  color: #0f172a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1.28;
+  overflow-wrap: anywhere;
+}
+
+.lab-method-toast p {
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 0.18rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.lab-method-toast-progress {
+  display: grid;
+  grid-template-columns: repeat(var(--trace-step-count), minmax(0, 1fr));
+  gap: 0.32rem;
+  margin-top: 0.72rem;
+}
+
+.lab-method-toast-progress span {
+  height: 0.18rem;
+  border-radius: 999px;
+  background: #dbe4ef;
+}
+
+.lab-method-toast-progress .lab-method-toast-progress-active {
+  background: #0f172a;
+}
+
+@keyframes lab-reagent-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+
+  50% {
+    transform: translateY(-0.48rem) rotate(3deg);
+  }
+}
+
+@keyframes lab-combust-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateY(-0.42rem) scale(1.08) rotate(2deg);
+  }
+}
+
+@keyframes lab-fuel-carbon-heat {
+  0%,
+  100% {
+    box-shadow:
+      0 16px 28px rgba(15, 23, 42, 0.2),
+      0 0 0 1px rgba(15, 23, 42, 0.06);
+  }
+
+  45% {
+    box-shadow:
+      0 16px 28px rgba(15, 23, 42, 0.2),
+      0 0 0 1px rgba(15, 23, 42, 0.06),
+      0 0 24px rgba(251, 146, 60, 0.34);
+  }
+}
+
+@keyframes lab-bond-heat {
+  0%,
+  100% {
+    background: color-mix(in srgb, var(--lab-accent, #14b8a6) 34%, #0f172a);
+    opacity: 0.95;
+  }
+
+  50% {
+    background: #f97316;
+    opacity: 0.62;
+  }
+}
+
+@keyframes lab-fuel-spark {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0.45rem) scale(0.5);
+  }
+
+  24%,
+  48% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(0.85rem, -1.2rem) scale(0.2);
+  }
+}
+
+@keyframes lab-combust-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.38);
+  }
+
+  30% {
+    opacity: 0.82;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.42);
+  }
+}
+
+@keyframes lab-oxygen-feed {
+  0% {
+    opacity: 0;
+    transform: translate(-2.4rem, var(--oxygen-y)) scale(0.72);
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 0.92;
+    transform: translate(1.2rem, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(1.65rem, 0) scale(0.36);
+  }
+}
+
+@keyframes lab-product-flight {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  78% {
+    opacity: 1;
+    transform: translate(var(--product-travel), var(--product-y)) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--product-travel), var(--product-y)) scale(0.68);
+  }
+}
+
+@keyframes lab-product-card-glow {
+  0%,
+  100% {
+    border-color: rgba(226, 232, 240, 0.9);
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+    transform: translateY(0);
+  }
+
+  55% {
+    border-color: rgba(251, 146, 60, 0.34);
+    box-shadow: 0 24px 48px rgba(249, 115, 22, 0.12);
+    transform: translateY(-0.1rem);
+  }
+}
+
+@keyframes lab-oxygen-drift {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateX(-0.3rem) scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(0.35rem) scale(1.08);
+  }
+}
+
+@keyframes lab-drop-travel {
+  0% {
+    left: 0;
+    opacity: 0;
+    transform: translate(-20%, -50%) scale(0.72);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 100%;
+    opacity: 0;
+    transform: translate(-20%, -50%) scale(1.08);
+  }
+}
+
+@keyframes lab-apple-liquid-reveal {
+  from {
+    transform: translateY(108%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes lab-liquid-ripple {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0.5rem) scaleX(0.46);
+  }
+
+  35% {
+    opacity: 0.92;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -0.2rem) scaleX(1.18);
+  }
+}
+
+@keyframes lab-precipitate-settle {
+  from {
+    opacity: 0;
+    transform: translateY(-2.2rem) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lab-signal-spark {
+  0%,
+  100% {
+    opacity: 0.52;
+    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(0.82);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(var(--spark-x, 0), var(--spark-y, 0)) scale(1.16);
+  }
+}
+
+@media (max-width: 1100px) {
+  .lab-visual-workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-icon-dock {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-items: stretch;
+    justify-content: center;
+    min-height: auto;
+  }
+
+  .lab-control-container-types,
+  .lab-control-container-reagents {
+    flex: 1 1 21rem;
+  }
+
+  .lab-control-container-carbon {
+    flex: 1.35 1 28rem;
+  }
+
+  .lab-control-container-action {
+    flex: 0 1 13rem;
+  }
+
+  .lab-cinematic-stage {
+    min-height: 36rem;
+  }
+}
+
+@media (max-width: 780px) {
+  .lab-minimal-shell {
+    padding-inline: 0.85rem;
+  }
+
+  .lab-icon-dock {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .lab-control-container {
+    width: 100%;
+  }
+
+  .lab-cinematic-stage {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    padding: 1rem;
+  }
+
+  .lab-method-toast {
+    top: 0.72rem;
+    width: calc(100% - 1.2rem);
+    padding: 0.72rem;
+  }
+
+  .lab-method-toast-meta {
+    margin-bottom: 0.48rem;
+  }
+
+  .lab-method-toast-body {
+    grid-template-columns: 1.6rem minmax(0, 1fr);
+    gap: 0.58rem;
+  }
+
+  .lab-method-toast-index {
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.74rem;
+  }
+
+  .lab-method-toast code {
+    font-size: 0.78rem;
+  }
+
+  .lab-method-toast p {
+    font-size: 0.74rem;
+  }
+
+  .lab-stage-molecule,
+  .lab-stage-reagent,
+  .lab-stage-beaker {
+    min-height: auto;
+  }
+
+  .lab-stage-reagent {
+    min-height: 6rem;
+  }
+
+  .lab-combust-visual {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .lab-combust-fuel {
+    justify-items: center;
+    padding-right: 0;
+  }
+
+  .lab-combust-fuel .lab-molecule-chain {
+    justify-content: center;
+    transform-origin: center;
+  }
+
+  .lab-combust-fire {
+    min-height: 8rem;
+    justify-self: center;
+  }
+
+  .lab-combust-product-stream {
+    display: none;
+  }
+
+  .lab-combust-products {
+    width: 100%;
+  }
+
+  .lab-stage-reagent .lab-reagent-glyph {
+    width: 4rem;
+  }
+
+  .lab-pour-trail {
+    top: auto;
+    right: auto;
+    bottom: -1.1rem;
+    left: 50%;
+    width: 2px;
+    height: 3.6rem;
+    background: linear-gradient(180deg, var(--reagent-accent), transparent);
+    transform: translateX(-50%);
+  }
+
+  .lab-pour-trail::before,
+  .lab-pour-trail::after {
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -20%);
+    animation-name: lab-drop-travel-mobile;
+  }
+
+  .lab-apple-beaker {
+    width: min(74vw, 15rem);
+    height: min(96vw, 20rem);
+  }
+
+  .lab-reaction-signal {
+    top: 3%;
+    right: 4%;
+  }
+}
+
+@media (max-width: 520px) {
+  .lab-icon-button {
+    min-height: 5.35rem;
+    padding: 0.56rem;
+  }
+
+  .lab-reagent-icon-button {
+    min-height: 6.45rem;
+  }
+
+  .lab-option-label {
+    font-size: 0.68rem;
+  }
+
+  .lab-option-sub {
+    font-size: 0.58rem;
+  }
+
+  .lab-carbon-strip {
+    grid-template-columns: 2rem minmax(0, 1fr) 2rem;
+    padding: 0.58rem;
+  }
+
+  .lab-carbon-step {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .lab-carbon-token {
+    width: 2.36rem;
+    height: 2.36rem;
+  }
+
+  .lab-h-orbit {
+    width: 0.32rem;
+    height: 0.32rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-stage-reagent .lab-reagent-glyph,
+  .lab-combust-fire svg,
+  .lab-oxygen-dot,
+  .lab-oxygen-pair,
+  .lab-combust-ring,
+  .lab-combust-fuel-spark,
+  .lab-combust-fuel .lab-carbon-core,
+  .lab-combust-fuel .lab-chain-bond span,
+  .lab-product-particle,
+  .lab-product-card,
+  .lab-pour-trail::before,
+  .lab-pour-trail::after,
+  .lab-beaker-liquid-final,
+  .lab-beaker-ripple,
+  .lab-beaker-precipitate,
+  .lab-reaction-signal-reactive span {
+    animation: none;
+  }
+
+  .lab-method-toast {
+    transition: none;
+  }
+
+  .lab-beaker-liquid-final {
+    transform: translateY(0);
+  }
+
+  .reagent-phase-precipitate .lab-beaker-precipitate,
+  .reagent-phase-white-precipitate .lab-beaker-precipitate,
+  .reagent-phase-changed .lab-beaker-precipitate {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lab-drop-travel-mobile {
+  0% {
+    top: 0;
+    opacity: 0;
+    transform: translate(-50%, -20%) scale(0.72);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+    transform: translate(-50%, -20%) scale(1.08);
   }
 }

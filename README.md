@@ -4,12 +4,13 @@
 
 ## 현재 개발 상태
 
-현재 브랜치인 `milestone/03-reagent--visual`은 전체 개발 계획 중 **3단계**입니다.
+현재 브랜치인 `milestone/05-final-check`는 전체 개발 계획 중 **최종 점검 단계**입니다.
 
 - 1단계 `Class Map`: OOP 상속 구조와 클래스별 오버라이딩 결과를 클릭 인터랙션으로 확인할 수 있습니다.
 - 2단계 `Combustion View`: 탄화수소 종류와 탄소 수에 따라 완전 연소식, 분자량, 산소 요구량, 생성물 수가 즉시 갱신되며 단계별 반응 흐름을 시각화합니다.
 - 3단계 `Reagent Test`: 브롬수, 과망가니즈산 칼륨, 암모니아성 질산은 반응을 타입별 다형성으로 시각화합니다.
 - 4단계 `Reaction Lab`: 탄화수소 종류, 탄소 수, 시약을 함께 조합해 색 변화와 침전 여부를 빠르게 관찰합니다.
+- 5단계 `Final Check`: 공용 컴포넌트 정리, 재현 가능한 의존성 버전 고정, 사용하지 않는 전역 스타일 제거, 문서 최신화를 진행합니다.
 
 ## 주요 기능
 
@@ -38,7 +39,7 @@
 
 - 같은 `perform_test(reagent)` 호출이 `Alkane`, `Alkene`, `Alkyne`에서 서로 다른 결과를 내는 과정을 보여줍니다.
 - 브롬수, 과망가니즈산 칼륨, 암모니아성 질산은의 초기 색과 반응 후 관찰 결과를 CSS 비커 시각화로 표현합니다.
-- 암모니아성 질산은 반응을 알카인 계열의 침전 반응 예시로 단순화해 표시합니다.
+- 암모니아성 질산은 반응을 말단 알카인 침전 반응 예시로 단순화해 표시합니다.
 
 ### Reaction Lab
 
@@ -78,8 +79,12 @@ src/
     globals.css           # 전역 스타일과 반응/분자 애니메이션
   components/
     AppNavigation.jsx     # 상단 라우트 내비게이션
+    ChemicalText.jsx      # 화학식과 일반식 표시용 공용 컴포넌트
   lib/
     hydrocarbons.js       # 탄화수소 데이터, 계산 함수, 시약 반응 규칙
+    hydrocarbons.test.js  # 계산 함수와 시약 결과 회귀 테스트
+    radioNavigation.js    # radio group 키보드 이동 헬퍼
+    radioNavigation.test.js # radio group 키보드 이동 회귀 테스트
 ```
 
 ## 실행 방법
@@ -101,6 +106,7 @@ npm run dev
 ## 검증 방법
 
 ```bash
+npm run test
 npm run lint
 npm run build
 ```

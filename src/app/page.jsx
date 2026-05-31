@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AppNavigation from "@/components/AppNavigation";
+import { ChemicalFormula, FormulaRule } from "@/components/ChemicalText";
 import {
   formatNumber,
   getHydrocarbonDetails,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/hydrocarbons";
 
 const desktopPanelHeight = "100rem";
+const mobileDescriptionTitleId = "mobile-class-description-title";
 const structuralClasses = {
   adt: {
     className: "HydrocarbonADT",
@@ -73,28 +75,6 @@ const structuralClasses = {
       "Base Class는 공통 데이터와 계산을 한곳에 모으고, Alkane/Alkene/Alkyne이 필요한 부분만 재정의하도록 받쳐줍니다.",
   },
 };
-
-function FormulaRule({ rule }) {
-  const hydrogenRule = {
-    "CnH2n+2": "2n+2",
-    CnH2n: "2n",
-    "CnH2n-2": "2n-2",
-  }[rule];
-
-  return (
-    <span className="formula">
-      C<sub>n</sub>H<sub>{hydrogenRule}</sub>
-    </span>
-  );
-}
-
-function ChemicalFormula({ carbon, hydrogen }) {
-  return (
-    <span className="formula">
-      C<sub>{carbon}</sub>H<sub>{hydrogen}</sub>
-    </span>
-  );
-}
 
 function CombustionEquation({ type, details }) {
   return (
@@ -252,7 +232,7 @@ function ClassNode({
   );
 }
 
-function DescriptionPanel({ selectedDescription, onClose }) {
+function DescriptionPanel({ selectedDescription, onClose, titleId }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between gap-5">
@@ -260,7 +240,10 @@ function DescriptionPanel({ selectedDescription, onClose }) {
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300">
             Class Description
           </p>
-          <h2 className="mt-3 text-4xl font-semibold tracking-normal">
+          <h2
+            id={titleId}
+            className="mt-3 text-4xl font-semibold tracking-normal"
+          >
             {selectedDescription.className}
           </h2>
           <p className="korean-keep mt-3 text-base leading-7 text-slate-300">
@@ -403,6 +386,7 @@ function useDesktopLayout() {
 export default function Home() {
   const [selectedKey, setSelectedKey] = useState("alkane");
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const mobileDialogRef = useRef(null);
   const isDesktopLayout = useDesktopLayout();
   const selectedDescription = useMemo(
     () => getDescriptionData(selectedKey),
@@ -416,11 +400,40 @@ export default function Home() {
         overflowY: "auto",
       }
     : undefined;
+  const shouldShowMobileDescription = isDescriptionOpen && !isDesktopLayout;
 
   function handleClassSelect(key) {
     setSelectedKey(key);
-    setIsDescriptionOpen(true);
+
+    if (!isDesktopLayout) {
+      setIsDescriptionOpen(true);
+    }
   }
+
+  useEffect(() => {
+    if (!shouldShowMobileDescription) {
+      return undefined;
+    }
+
+    const previouslyFocusedElement = document.activeElement;
+    mobileDialogRef.current?.focus();
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsDescriptionOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+
+      if (previouslyFocusedElement instanceof HTMLElement) {
+        previouslyFocusedElement.focus();
+      }
+    };
+  }, [shouldShowMobileDescription]);
 
   return (
     <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,#eefcf9,transparent_34%),linear-gradient(180deg,#ffffff_0%,#f7f8fb_100%)] text-slate-950">
@@ -550,21 +563,21 @@ export default function Home() {
         </div>
       </section>
 
-      {isDescriptionOpen ? (
+      {shouldShowMobileDescription ? (
         <div
+          ref={mobileDialogRef}
           className="fixed inset-0 z-50 overflow-y-auto bg-slate-950 text-white lg:hidden"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="mobile-class-description-title"
+          aria-labelledby={mobileDescriptionTitleId}
+          tabIndex={-1}
         >
           <div className="min-h-screen p-5">
-            <section
-              id="mobile-class-description-title"
-              className="mx-auto max-w-xl"
-            >
+            <section className="mx-auto max-w-xl">
               <DescriptionPanel
                 selectedDescription={selectedDescription}
                 onClose={() => setIsDescriptionOpen(false)}
+                titleId={mobileDescriptionTitleId}
               />
             </section>
           </div>

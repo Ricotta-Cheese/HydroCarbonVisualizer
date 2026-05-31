@@ -25,8 +25,8 @@ export const reagentMetadata = {
     finalLabel: "흰색 침전 또는 변화 없음",
     initialColor: "#e2e8f0",
     accentColor: "#94a3b8",
-    detects: "알카인 계열의 침전 반응",
-    observation: "흰색 침전물이 생기는지 관찰합니다.",
+    detects: "말단 알카인의 침전 반응",
+    observation: "말단 알카인 예시에서 흰색 침전물이 생기는지 관찰합니다.",
   },
 };
 
@@ -89,7 +89,7 @@ export const hydrocarbonTypes = {
     hydrogenCount: (carbon) => 2 * carbon - 2,
     reagentResult: (reagent) => {
       if (reagent === "암모니아성 질산은") {
-        return "흰색 침전물 생성됨";
+        return "말단 알카인 예시로 흰색 침전물 생성됨";
       }
       if (reagent === "브롬수" || reagent === "과망가니즈산 칼륨") {
         return "빠르게 반응하여 색이 변화함";
@@ -186,7 +186,7 @@ const reagentVisuals = {
       tone: "reactive",
       status: "White precipitate",
       labComment: "흰색 침전 생성",
-      observation: "알카인 선택 시 흰색 침전이 생성됩니다.",
+      observation: "말단 알카인 예시로 흰색 침전이 생성됩니다.",
     },
   },
 };
